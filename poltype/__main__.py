@@ -78,6 +78,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Disable checkpoint saving during this run",
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate inputs and report what would be done without running QM",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"poltype2 {pkg_version('poltype2')}",
@@ -148,6 +153,11 @@ def main(argv: list[str] | None = None) -> int:
     # -- resolve relative structure path against work directory --
     if config.structure is not None and not config.structure.is_absolute():
         config.structure = (work_dir / config.structure).resolve()
+
+    # -- apply dry-run flag --
+    if args.dry_run:
+        config.dry_run = True
+        logger.info("Dry-run mode: QM stages will be skipped")
 
     # -- select QM backend --
     backend = select_backend(config, work_dir=work_dir)

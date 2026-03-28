@@ -209,6 +209,7 @@ class PoltypeConfig:
     check_input_only: bool = False
     generate_input_files_only: bool = False
     gen_prot_states_only: bool = False
+    dry_run: bool = False
 
     # --- molecule / protonation ---
     total_charge: Optional[int] = None
