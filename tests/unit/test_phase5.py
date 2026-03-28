@@ -658,21 +658,21 @@ class TestFullPipelineWithCheckpoint:
         )
         result = runner.run(ctx)
 
-        # All 6 stages complete
-        assert len(result.stage_results) == 6
+        # All 8 stages complete
+        assert len(result.stage_results) == 8
         for sr in result.stage_results.values():
             assert sr.status is StageStatus.COMPLETED
 
-        # Checkpoint has all 6 stages
-        assert len(mgr.data.completed_stages) == 6
+        # Checkpoint has all 8 stages
+        assert len(mgr.data.completed_stages) == 8
 
-        # Events include pipeline start/end + 6 started + 6 completed = 14
+        # Events include pipeline start/end + 8 started + 8 completed = 18
         assert events[0].event is PipelineEvent.PIPELINE_STARTED
         assert events[-1].event is PipelineEvent.PIPELINE_COMPLETED
         started = [e for e in events if e.event is PipelineEvent.STAGE_STARTED]
         completed = [e for e in events if e.event is PipelineEvent.STAGE_COMPLETED]
-        assert len(started) == 6
-        assert len(completed) == 6
+        assert len(started) == 8
+        assert len(completed) == 8
 
     def test_resume_full_pipeline(
         self, default_config, methane, mock_backend, tmp_path,

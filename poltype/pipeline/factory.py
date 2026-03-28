@@ -2,7 +2,7 @@
 poltype.pipeline.factory – default pipeline construction.
 
 The :func:`build_default_pipeline` function assembles a
-:class:`PipelineRunner` with the standard six-stage sequence that
+:class:`PipelineRunner` with the standard eight-stage sequence that
 mirrors the monolithic ``GenerateParameters()`` method.
 
 Usage::
@@ -19,6 +19,8 @@ unit-tested in isolation.
 from __future__ import annotations
 
 from poltype.pipeline.runner import PipelineRunner
+from poltype.pipeline.stages.atom_typing import AtomTypingStage
+from poltype.pipeline.stages.database_match import DatabaseMatchStage
 from poltype.pipeline.stages.esp import ESPFittingStage
 from poltype.pipeline.stages.finalization import FinalizationStage
 from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
@@ -36,8 +38,10 @@ def build_default_pipeline() -> PipelineRunner:
     2. :class:`GeometryOptimizationStage`
     3. :class:`ESPFittingStage`
     4. :class:`MultipoleStage`
-    5. :class:`TorsionFittingStage`
-    6. :class:`FinalizationStage` (with default output writers)
+    5. :class:`AtomTypingStage`
+    6. :class:`DatabaseMatchStage`
+    7. :class:`TorsionFittingStage`
+    8. :class:`FinalizationStage` (with default output writers)
 
     Returns
     -------
@@ -61,6 +65,8 @@ def build_default_pipeline() -> PipelineRunner:
         .add_stage(GeometryOptimizationStage())
         .add_stage(ESPFittingStage())
         .add_stage(MultipoleStage())
+        .add_stage(AtomTypingStage())
+        .add_stage(DatabaseMatchStage())
         .add_stage(TorsionFittingStage())
         .add_stage(FinalizationStage(writers=writers))
     )
