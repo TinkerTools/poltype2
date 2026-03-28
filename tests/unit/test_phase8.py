@@ -658,7 +658,7 @@ class TestFullPipelineWithFragmentation:
         assert result is not None
         assert isinstance(result, FragmentResult)
 
-    def test_all_nine_stages_complete(self, tmp_path):
+    def test_all_ten_stages_complete(self, tmp_path):
         """All 10 stages complete in a full pipeline run."""
         mol = _make_ethanol()
         config = PoltypeConfig(

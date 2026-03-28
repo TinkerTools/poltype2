@@ -796,6 +796,7 @@ class TestFullPipelineWithTyping:
             assert sr.status is StageStatus.COMPLETED
 
     def test_output_files_use_typed_atoms(self, tmp_path):
+        """Output files reflect assigned atom types."""
         mol = _make_ethanol()
         config = PoltypeConfig(
             small_molecule_smarts_to_tinker_class="/nonexistent_smarts.txt"
