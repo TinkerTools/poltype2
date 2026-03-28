@@ -238,7 +238,10 @@ class TestEventBus:
 
     def test_hooks_property_returns_copy(self):
         bus = EventBus()
-        hook = lambda d: None  # noqa: E731
+
+        def hook(d):
+            pass
+
         bus.register(hook)
         hooks = bus.hooks
         hooks.clear()
