@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 from poltype.config.loader import load_config
@@ -66,7 +67,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="poltype2 0.0.0-dev",
+        version=f"poltype2 {pkg_version('poltype2')}",
     )
     return parser
 
