@@ -23,7 +23,6 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
 from rdkit import Chem
-from rdkit.Chem import RingInfo
 
 from poltype.fragmentation.fragment import Fragment, FragmentResult
 from poltype.molecule.molecule import Molecule
@@ -419,8 +418,8 @@ class RuleBasedFragmenter(Fragmenter):
             if in_ring and is_aromatic:
                 for neig in atom.GetNeighbors():
                     neig_idx = neig.GetIdx()
-                    same_ring = RingInfo.AreAtomsInSameRing(
-                        ring_info, idx, neig_idx,
+                    same_ring = ring_info.AreAtomsInSameRing(
+                        idx, neig_idx,
                     )
                     if same_ring or neig.GetAtomicNum() == 1:
                         continue
@@ -549,7 +548,7 @@ class RuleBasedFragmenter(Fragmenter):
         atoms_in_ring: Set[int] = set()
         atoms_in_fused: Set[int] = set()
         for idx in range(rdmol.GetNumAtoms()):
-            n_rings = RingInfo.NumAtomRings(ring_info, idx)
+            n_rings = ring_info.NumAtomRings(idx)
             if n_rings > 0:
                 atoms_in_ring.add(idx)
             if n_rings > 1:
@@ -571,7 +570,7 @@ class RuleBasedFragmenter(Fragmenter):
         for idx in atoms_in_ring:
             for bond_i, bond_j in fused_cc_bonds:
                 for fused_idx in (bond_i, bond_j):
-                    if RingInfo.AreAtomsInSameRing(ring_info, idx, fused_idx):
+                    if ring_info.AreAtomsInSameRing(idx, fused_idx):
                         all_atoms_in_fused_ring.add(idx)
 
         # Remove fused ring atoms not in the same ring as torsion atoms.
@@ -579,7 +578,7 @@ class RuleBasedFragmenter(Fragmenter):
             shares_ring = False
             for torsion_idx in torsion_region:
                 if torsion_idx in all_atoms_in_fused_ring:
-                    if RingInfo.AreAtomsInSameRing(ring_info, idx, torsion_idx):
+                    if ring_info.AreAtomsInSameRing(idx, torsion_idx):
                         shares_ring = True
                         break
             if not shares_ring:
