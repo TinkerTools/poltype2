@@ -3,12 +3,13 @@ poltype.__main__ – CLI entry point for ``python -m poltype``.
 
 Parses command-line arguments, loads configuration, builds the default
 pipeline, and runs it.  This wires together every layer introduced in
-Phases 1–3.
+Phases 1–5.
 
 Usage::
 
     python -m poltype --config poltype.ini --work-dir ./output
     python -m poltype --verbose
+    python -m poltype --resume
     python -m poltype --version
 """
 
@@ -23,7 +24,9 @@ from pathlib import Path
 from poltype.config.loader import load_config
 from poltype.errors import ConfigError, PoltypeError
 from poltype.logging_config import setup_logging
+from poltype.pipeline.checkpoint import CheckpointManager
 from poltype.pipeline.context import PipelineContext
+from poltype.pipeline.events import EventBus, EventData, PipelineEvent
 from poltype.pipeline.factory import build_default_pipeline
 from poltype.pipeline.stage import StageStatus
 from poltype.qm.factory import select_backend
@@ -65,11 +68,45 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Suppress all output except warnings and errors",
     )
     parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from the last checkpoint (skip already-completed stages)",
+    )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable checkpoint saving during this run",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"poltype2 {pkg_version('poltype2')}",
     )
     return parser
+
+
+def _logging_hook(data: EventData) -> None:
+    """Default event hook that logs every pipeline event."""
+    if data.event is PipelineEvent.STAGE_STARTED:
+        logger.info("[event] Stage '%s' started", data.stage_name)
+    elif data.event is PipelineEvent.STAGE_COMPLETED:
+        elapsed = data.extra.get("elapsed_seconds", 0.0)
+        logger.info(
+            "[event] Stage '%s' completed (%.2fs)",
+            data.stage_name,
+            elapsed,
+        )
+    elif data.event is PipelineEvent.STAGE_SKIPPED:
+        logger.info("[event] Stage '%s' skipped", data.stage_name)
+    elif data.event is PipelineEvent.STAGE_FAILED:
+        logger.error(
+            "[event] Stage '%s' failed: %s", data.stage_name, data.message,
+        )
+    elif data.event in (
+        PipelineEvent.PIPELINE_STARTED,
+        PipelineEvent.PIPELINE_COMPLETED,
+    ):
+        logger.info("[event] %s", data.message)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -116,8 +153,28 @@ def main(argv: list[str] | None = None) -> int:
     backend = select_backend(config, work_dir=work_dir)
     logger.info("QM backend: %s", backend.name)
 
+    # -- set up event bus --
+    event_bus = EventBus()
+    event_bus.register(_logging_hook)
+
+    # -- set up checkpoint manager --
+    checkpoint: CheckpointManager | None = None
+    if not args.no_checkpoint:
+        checkpoint = CheckpointManager(checkpoint_dir=work_dir)
+        if args.resume:
+            try:
+                checkpoint.load()
+                logger.info("Resuming from checkpoint")
+            except FileNotFoundError:
+                logger.warning(
+                    "No checkpoint file found — starting from scratch"
+                )
+
     # -- build and run pipeline --
     runner = build_default_pipeline()
+    runner.event_bus = event_bus
+    runner.checkpoint_manager = checkpoint
+
     context = PipelineContext(
         config=config,
         backend=backend,
