@@ -20,6 +20,9 @@ dev = [
     "pytest-cov",
 ]
 
+[project.scripts]
+poltype2 = "poltype.__main__:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["poltype*"]
