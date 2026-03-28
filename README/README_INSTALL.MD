@@ -1,160 +1,104 @@
 ## Installation
 
+### Prerequisites
 
-### Required Programs
-* Tinker, version >=8.9.4
-* GDMA, version 2.3 and greater
-* PSI4 (or Gaussian 09/16)
+| Program | Version | Notes |
+|---------|---------|-------|
+| Python | >= 3.9 | With pip |
+| Tinker | >= 8.9.4 | CPU build required |
+| GDMA | >= 2.3 | Distributed multipole analysis |
+| Psi4 **or** Gaussian 09/16 | — | Quantum chemistry engine |
 
+### 1. Install Poltype2
 
-### Required Tinker CPU Installation
+```bash
+git clone https://github.com/TinkerTools/poltype2.git
+cd poltype2
+pip install -e ".[dev]"
 ```
+
+This installs `poltype2` as an editable package with the `poltype2` CLI
+command.  Core dependencies (RDKit, NumPy) are pulled in automatically.
+
+### 2. Install Tinker (CPU)
+
+```bash
 git clone git@github.com:TinkerTools/Tinker.git tinker
-cd tinker
-cd fftw
-./configure --prefix=/path_to_tinkerfolder/fftw/ --enable-openmp --enable-threads
-make -j 8
-make install
+cd tinker/fftw
+./configure --prefix=$(pwd) --enable-openmp --enable-threads
+make -j 8 && make install
 cd ..
 cp ./make/Makefile ./source
 cd source
 ```
-* Open Makefile and comment out default operating system (MAC, unless you have mac)
-* Uncomment the default linux installation lines
-* Keep the RENAME line commented out
 
+Open `Makefile`, comment out the default OS section (Mac) and uncomment the
+Linux lines.  Keep the `RENAME` line commented out.  Then:
 
-## Optional Tinker GPU Installation
-* **Not required for parameterization purpose.**
-* Install tinker CPU first. 
-```
-git clone git@github.com:TinkerTools/tinker9.git
-cd tinker9
-cp -r TinkerCPU/* tinker/.
-mkdir compile
-cd compile
-export CUDAHOME=/usr/local/cuda-10.2
-export CUDACXX=$CUDAHOME/bin/nvcc
-export FC=/usr/bin/gfortran
-export CXX=/usr/bin/g++
-export ACC=/home/liuchw/shared/nvidia/hpc_sdk/Linux_x86_64/21.1/compilers/bin/nvc++
-export opt=release
-export host=0
-export prec=m
-export compute_capability=80
-export cuda_dir=$CUDAHOME
-export CMAKEHOME=/home/liuchw/shared/cmake3.12/bin/
-$CMAKEHOME/cmake ../
-make -j
+```bash
+make -j 8
 ```
 
+Add the resulting executables (`analyze`, `poledit`, `potential`, `minimize`,
+`dynamic`, `bar`) to your `PATH`.
 
-### Python Envioronment
-* Simply using the following git command to download Poltype
-```shell
-git clone https://github.com/TinkerTools/poltype2.git master
+#### Optional: Tinker-GPU
+
+Tinker-GPU is **not** required for parameterisation.  See the
+[Tinker9 repository](https://github.com/TinkerTools/tinker9) for GPU build
+instructions.
+
+### 3. Install a Quantum Chemistry Package
+
+**Psi4 (recommended, free licence):**
+
+```bash
+conda install -c conda-forge psi4
 ```
 
-* Install anaconda
-* Use the following environment.yml file with `conda env create -f environment.yml` Source: https://github.com/TinkerTools/poltype2/issues/45#issuecomment-2137669523 
-* Alternatively, you may use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype"
-* environment.yml:
-```yaml
-name: mypoltype2
-channels:
-  - conda-forge
-  - rdkit
-  - salilab
-dependencies:
-  - micromamba
-  - psi4
-  - geometric
-  - mdanalysis
-  - openbabel
-  - svgutils
-  - cairosvg
-  - psutil
-  - mdtraj
-  - openpyxl
-  - pdb2pqr
-  - pdbfixer
-  - rdkit
-  - modeller
-  - gdma
-	- dftd4
-  - pip
-  - pip:
-    - pymbar
-    - PyAstronomy
-    - ase 
-    - jax
-		- pyscf==2.7.0
-		- dftd3
-		- pyscf-dispersion
+**Gaussian 09/16:** Follow your site's installation instructions and ensure
+`g09` or `g16` is on your `PATH`.
+
+**PySCF (lightweight alternative):**
+
+```bash
+pip install pyscf
 ```
 
-* Download GDMA-2.3 and greater
-* Note do not put source in your default .bashrc profile
-* Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
+### 4. Install GDMA
 
-### Install fennol
+Download GDMA >= 2.3 from the official source and add the `gdma` binary to
+your `PATH`.
 
-```
+### 5. Optional: Install FeNNol (ML Potentials)
+
+```bash
 git clone https://github.com/thomasple/FeNNol.git
-cd FeNNol
-pip install .
+cd FeNNol && pip install .
 ```
 
-### Optional explicit Conda Installation
-* Only do this if the above .yml file doesnt work
-```
-conda create --name amoebamdpoltype -c psi4 psi4 --yes
-conda install -c conda-forge geometric --yes
-conda activate amoebamdpoltype
-conda config --add channels conda-forge
-conda install mdanalysis --yes
-conda install -c conda-forge openbabel --yes
-conda install -c rdkit rdkit --yes
-pip install PyAstronomy
-conda install -c conda-forge svgutils --yes
-conda install -c conda-forge cairosvg --yes
-conda install -c conda-forge psutil --yes
-conda install -c conda-forge mdtraj --yes
-conda install -c conda-forge pymbar --yes
-conda install -c salilab modeller --yes
-conda install -c anaconda openpyxl --yes
-conda install -c conda-forge pdb2pqr --yes
-conda install -c conda-forge pdbfixer --yes
-```
+### 6. Environment Variables
 
-### Required explicit Conda Installation - XTB
-```
-conda create --name xtbenv
-conda activate xtbenv
-conda install -c conda-forge xtb --yes
-```
-* add the path to xtb binary in PATH
+Before running Poltype, ensure these programs are discoverable:
 
-
-### Explicit Conda Installation - ANI
-```
-conda install -c conda-forge ase --yes
-conda install -c conda-forge torchani --yes
-conda install -c conda-forge openbabel --yes
-```
-* Install via ani.yml file (under `Environments`)
-
-### Environment var for running POLTYPE:
- Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
-* Example bashrc that you should source before running poltype. Note "mypoltype2" matches the conda env above
-```shell
-export myusername=`whoami`
-conda activate mypoltype2
-export g09root=/opt/g09gh/gaussian
+```bash
+# Example: source this before running poltype
+export PATH=/path/to/tinker/bin:$PATH
+export PATH=/path/to/gdma/bin:$PATH
+export PSI_SCRATCH=/scratch/$USER/
+# If using Gaussian:
+export g09root=/opt/gaussian
 source $g09root/g09/bsd/g09.profile
-export GAUSS_SCRDIR=/scratch/$myusername/
-export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
-export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
-export PSI_SCRATCH=/scratch/$myusername/
-# add tinker exe to path
+export GAUSS_SCRDIR=/scratch/$USER/
+```
+
+> **Tip:** Do not put `source` commands for multiple conflicting environments
+> in the same `.bashrc` file.
+
+### 7. Verify Installation
+
+```bash
+poltype2 --version
+# or
+python -m poltype --version
 ```

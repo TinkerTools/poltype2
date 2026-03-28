@@ -1,19 +1,19 @@
 # Poltype2: Automation of AMOEBA Polarizable Force Field for Small Molecules
 
-## Obejective
-Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly.
+## Objective
 
-[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+Given an input chemical structure, all force-field parameters are automatically
+assigned from a database or derived via fitting to ab initio data generated on
+the fly.
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
+[![License][license-shield]][license-url]
 
 [contributors-shield]: https://img.shields.io/github/contributors/TinkerTools/poltype2.svg?style=for-the-badge
-[contributors-url]: https://github.com/TinkerTools/poltype2/forks/graphs/contributors
+[contributors-url]: https://github.com/TinkerTools/poltype2/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/TinkerTools/poltype2.svg?style=for-the-badge
 [forks-url]: https://github.com/TinkerTools/poltype2/network/members
 [stars-shield]: https://img.shields.io/github/stars/TinkerTools/poltype2.svg?style=for-the-badge
@@ -23,122 +23,166 @@ Given an input chemical structure, all parameters can be automatically assigned 
 [license-shield]: https://img.shields.io/github/license/TinkerTools/poltype2.svg?style=for-the-badge
 [license-url]: https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf
 
-
-
-
 ## Please Cite
 
-Walker, B., Liu, C., Wait, E., Ren, P., J. Comput. Chem. 2022, 1. https://doi.org/10.1002/jcc.26954
+Walker, B., Liu, C., Wait, E., Ren, P., J. Comput. Chem. 2022, 1.
+<https://doi.org/10.1002/jcc.26954>
 
-
-Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameterization for small molecules. Theor Chem Acc. 2012 Feb 26;131(3):1138. doi: 10.1007/s00214-012-1138-6. PMID: 22505837; PMCID: PMC3322661.
+Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field
+parameterization for small molecules. Theor Chem Acc. 2012;131(3):1138.
+doi:10.1007/s00214-012-1138-6
 
 ## License
+
 [Tinker License](https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf)
 
-## 📚 Documentation Overview 
+---
 
-* Please read 👇🙏
+## Features
 
-### Features
+### Input Features
 
+* Automated total charge assignment from bond orders and element valences
+* Dominant ionization state enumeration (pH 7) and tautomer enumeration
+* Smart memory / CPU resource defaults for QM jobs
 
-* Parameterization Input Features
-    * Automated total charge assignment
-    * Dominant ionization state enumeration (pH=7) / tautomer enumeration 
-    * Smart memory resource defaults for QM jobs
-* Parameterization Features
-    * Molecule fragmenter to speed up QM calculations
-    * Parallelized job submission for QM jobs
-    * Psi4/Gaussian quantum package support
-    * QM dimer data generation for vdW fitting
-    * Torsion-Torsion coupling
-    * Expanded torsion database
+### Parameterization Features
 
+* 10-stage modular pipeline with checkpoint/resume support
+* Molecule fragmentation to speed up QM calculations
+* Parallelised QM job submission (Psi4, Gaussian, PySCF)
+* SMARTS-based atom typing and database parameter matching
+* QM dimer data generation for van der Waals fitting
+* Torsion-Torsion coupling
+* Expanded torsion parameter database
+* Post-run validation (energy convergence, QM/MM RMSD)
 
-[💻 Program Installation](README/README_INSTALL.MD)
+---
 
+## Quick Start
 
-### Automated AMOEBA Ligand Parameterization (Main function of Poltype)
+### Installation
 
-[Parameterization Input Preparation](#parameterization-input-preparation)
-
-[Ligand Protonation State Generation](#ligand-protonation-state-generation)
-
-[Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
-
-[Recommended-Poltype-inputs](#recommended-poltype-inputs)
-
-[Default Resource Consumption](#default-resource-consumption)
-
-[💻 Advanced Program Usage](README/README_HELP.MD)
-
-[Parameterization Output Files](README/README_OUTPUT.MD)
-
-* [Final XYZ File](README/README_OUTPUT.MD)
-
-* [Final Key File](README/README_OUTPUT.MD)
-
-* [Poltype Log File](README/README_OUTPUT.MD)
-
-* [OPENME Plots](README/README_OUTPUT.MD)
-
-[Parameterization Sanity Checks](#parameterization-sanity-checks)
-
-[Parameterization Examples](Examples/Parameterization)
-
-[Automated AMOEBA Ligand Parameterization How It Works](README/README_PROTOCOL.MD)
-
-
-[💻 Advanced Program Usage](README/README_HELP.MD)
-
-
-
----------------------------------------------------------------------------------------------
-
-
-    
-### Parameterization Input Preparation
-* The input structure can be given as an filetype with bond order information (sdf,mol,mol2,etc..)
-* Cartesian XYZ, tinker XYZ and PDB is not recommended, this will be converted to an SDF file and bond orders will be guessed based on atomic distances.
-* If 2D structure is given, poltype will generate 3D coordinates for you.
-* Total charge is determined by computing the formal charge for each atom.
-* Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
-* Optional keywords exist to add missing hydrogens.
-* If carbon or nitrogen are negatively charged, then Poltype will assume you meant to have hydrogens on those atoms and protonate to neutral charge. For all other elements, if there exists a formal charge (due to input bond order and valence electrons of element), then poltype will detect the formal charge for you and compute total charge from sum of each formal atom charge. Warning message is printed when hydrogen atoms are added. 
-* Special radical charge states require additional information in the input file specifying which atom is a radical. 
-* If you do not want charged atoms to be protonated then use ``addhydrogentocharged=False``
-### Ligand Protonation State Generation
-* Dominant ionization states at pH 7 are enumerated and SDF files are generated via Dimorphite-DL (IonizationState_0.sdf,IonizationState_1.sdf,..). 
-* Tautomer states are enumerated via rdkit and the first tautomer is the canonical tautomer TautomerState_0.sdf
-* Use ``genprotstatesonly`` to quit program after generating dominant ionization states at pH=7 and tautomers.
-
-### Minimum Example Usage Parameterization
-
-__All input arguments are specified in poltype.ini file__
+```bash
+pip install -e ".[dev]"
 ```
+
+See [Installation Guide](README/README_INSTALL.MD) for full details on
+installing Tinker, GDMA, and quantum chemistry packages.
+
+### Minimum Usage
+
+Create a `poltype.ini` file:
+
+```ini
 structure=methylamine.sdf
 ```
-* Navigate to directory containing poltype.ini and .sdf file, and run:
 
-```shell
-nohup python /path_to_poltype/poltype.py &
+Run Poltype:
+
+```bash
+python -m poltype --config poltype.ini --work-dir ./output
 ```
 
-```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
-* After poltype finishes, check the ``OPENME`` folder for torsion fitting and ESP fitting results. 
+The resulting `final.xyz` and `final.key` are the structure and parameter
+files you need.
 
-### Default Resource Consumption
-* By default, Poltype computes the number of fragment poltype jobs (or any QM job if fragmenter is not being used) to run in parallel as the floor function of the input number of cores divided by the number of cores per job (default of 2). 
-* RAM, cores, and disk space can all be detected and a consumption ratio of 80% is used by default. Fragment RAM, disk, and cores are divided evenly by the number of Poltype jobs in parallel. 
+### CLI Options
 
-### Parameterization Sanity Checks
-* MM = Molecular Mechanics (AMOEBA model), QM = Quantum Mechanics
-* Check for 2D coordinates and generates 3D coordinates at begining of program 
-* Check to ensure refined multipoles enable MM to model the QM potential grid well and raises error if not
-* Check to ensure QM and MM dipoles are very similar and raise error if not
-* Check to ensure the final minimized MM structure is similar to the geometry optimized QM structure and raises error if not
-* Check for any missing van der Waals at end of program parameters and raises error
-* Check for any missing multipole parameters at end of program and raises error
-* Check for any zeroed out torsion parameters in final key file. Checks if fragmenter is transferring torsion properly.
+```
+python -m poltype --help
+
+Options:
+  -c, --config       Path to poltype.ini (default: poltype.ini)
+  -w, --work-dir     Working directory for output (default: current dir)
+  -v, --verbose      Enable verbose/debug logging
+  --resume           Resume from the last checkpoint
+  --no-checkpoint    Disable checkpoint saving
+  --dry-run          Validate inputs without running QM jobs
+  --version          Show version and exit
+```
+
+---
+
+## Pipeline Architecture
+
+Poltype2 uses a modular 10-stage pipeline:
+
+| # | Stage | Description |
+|---|-------|-------------|
+| 1 | **Input Preparation** | Load molecule, assign charges, validate structure |
+| 2 | **Geometry Optimisation** | QM geometry optimisation (MP2/6-31G*) |
+| 3 | **ESP Fitting** | Electrostatic potential grid computation |
+| 4 | **Multipole** | Distributed multipole analysis (GDMA) |
+| 5 | **Atom Typing** | SMARTS-based atom type assignment |
+| 6 | **Database Match** | Look up existing parameters |
+| 7 | **Fragmentation** | Fragment large molecules for torsion scanning |
+| 8 | **Torsion Fitting** | Torsion angle scanning and parameter fitting |
+| 9 | **Validation** | Energy convergence and QM/MM RMSD checks |
+| 10 | **Finalisation** | Write `final.xyz`, `final.key`, and summary report |
+
+Each stage is independently testable and communicates via an artifact
+dictionary in the pipeline context.
+
+---
+
+## Repository Layout
+
+```
+poltype2/
+├── poltype/                 # Main Python package
+│   ├── __main__.py          # CLI entry point
+│   ├── config/              # Configuration schema and INI loader
+│   ├── molecule/            # RDKit-based molecule representation
+│   ├── qm/                  # QM backend abstraction (Psi4, Gaussian, PySCF)
+│   ├── typing/              # SMARTS-based atom typing
+│   ├── database/            # Parameter database lookup
+│   ├── fragmentation/       # Rule-based and WBO molecular fragmentation
+│   ├── validation/          # Post-run energy and RMSD validation
+│   ├── output/              # Output writers (XYZ, KEY, summary)
+│   ├── pipeline/            # Pipeline framework (stages, runner, events, checkpoints)
+│   └── errors.py            # Custom exception hierarchy
+├── ParameterFiles/          # AMOEBA parameter databases and SMARTS mappings
+├── BasisSets/               # Quantum chemistry basis set files
+├── FennixModels/            # ANI machine-learning potentials
+├── Examples/                # Example parameterisation runs
+├── tests/unit/              # Unit tests (597 tests)
+├── README/                  # Extended documentation
+└── pyproject.toml           # Python packaging metadata
+```
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Installation Guide](README/README_INSTALL.MD) | Tinker, GDMA, QM packages, and Python environment setup |
+| [Advanced Usage](README/README_HELP.MD) | All `poltype.ini` keywords and CLI options |
+| [Output Files](README/README_OUTPUT.MD) | Description of generated files (`final.xyz`, `final.key`, logs) |
+| [Protocol Details](README/README_PROTOCOL.MD) | Technical details of the parameterisation workflow |
+| [File Manifest](README/README_MANIFEST.MD) | Intermediate and output file descriptions |
+
+---
+
+## Input Preparation
+
+* Input structure should be a file with bond order information (`.sdf`,
+  `.mol`, `.mol2`, etc.)
+* Cartesian XYZ, Tinker XYZ, and PDB are not recommended—these will be
+  converted to SDF and bond orders guessed from atomic distances
+* 2D structures are automatically converted to 3D coordinates
+* Total charge is computed from formal charges on each atom
+* Use `addhydrogens=True` to add missing hydrogens
+* Use `addhydrogentocharged=False` to prevent protonation of charged atoms
+
+## Validation Checks
+
+After parameterisation, Poltype automatically validates:
+
+* Refined multipoles reproduce QM electrostatic potential
+* QM and MM dipoles are consistent
+* Final MM-minimised structure matches QM-optimised geometry
+* No missing van der Waals or multipole parameters
+* No zeroed-out torsion parameters in the final key file
 
