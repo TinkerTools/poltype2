@@ -81,5 +81,5 @@ class ESPFittingStage(Stage):
         )
 
     def should_skip(self, context: PipelineContext) -> bool:
-        """Skip when only matching against the database."""
-        return context.config.database_match_only
+        """Skip when only matching against the database or in dry-run mode."""
+        return context.config.database_match_only or context.config.dry_run

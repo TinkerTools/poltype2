@@ -37,13 +37,24 @@ def build_default_pipeline() -> PipelineRunner:
     3. :class:`ESPFittingStage`
     4. :class:`MultipoleStage`
     5. :class:`TorsionFittingStage`
-    6. :class:`FinalizationStage`
+    6. :class:`FinalizationStage` (with default output writers)
 
     Returns
     -------
     PipelineRunner
         A fully assembled runner ready to execute.
     """
+    # Lazy imports to avoid circular dependency (output → pipeline → factory → output)
+    from poltype.output.key_writer import KeyFileWriter
+    from poltype.output.summary import SummaryWriter
+    from poltype.output.xyz_writer import XYZFileWriter
+
+    writers = [
+        XYZFileWriter(),
+        KeyFileWriter(),
+        SummaryWriter(),
+    ]
+
     return (
         PipelineRunner()
         .add_stage(InputPreparationStage())
@@ -51,5 +62,5 @@ def build_default_pipeline() -> PipelineRunner:
         .add_stage(ESPFittingStage())
         .add_stage(MultipoleStage())
         .add_stage(TorsionFittingStage())
-        .add_stage(FinalizationStage())
+        .add_stage(FinalizationStage(writers=writers))
     )

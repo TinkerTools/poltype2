@@ -276,6 +276,8 @@ def load_config(
         cfg.generate_input_files_only = _bool("generateinputfilesonly")
     if "genprotstatesonly" in raw:
         cfg.gen_prot_states_only = _bool("genprotstatesonly")
+    if "dryrun" in raw:
+        cfg.dry_run = _bool("dryrun")
 
     # ------------------------------------------------------------------
     # Molecule / protonation

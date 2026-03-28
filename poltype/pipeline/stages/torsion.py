@@ -98,8 +98,9 @@ class TorsionFittingStage(Stage):
         )
 
     def should_skip(self, context: PipelineContext) -> bool:
-        """Skip when torsion fitting is disabled or database-only mode."""
+        """Skip when torsion fitting is disabled, database-only, or dry-run mode."""
         return (
             not context.config.do_torsion_fit
             or context.config.database_match_only
+            or context.config.dry_run
         )

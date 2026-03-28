@@ -1,0 +1,21 @@
+============================================================
+  Poltype2 Pipeline Run Summary
+============================================================
+
+  Timestamp : 2026-03-28T16:30:42.377365+00:00
+  Molecule  : methane
+  Formula   : CH4
+  Atoms     : 5
+  Backend   : mock
+  Work dir  : /home/runner/work/poltype2/poltype2
+
+------------------------------------------------------------
+  Stage Results
+------------------------------------------------------------
+  input_preparation               COMPLETED     0.000s  Molecule already present in context
+  geometry_optimization           COMPLETED     0.000s  Optimised geometry (energy=-76.000000 Ha)
+  esp_fitting                     COMPLETED     0.000s  ESP grid computed (10 points)
+  multipole                       COMPLETED     0.000s  Multipole frames computed for 5 atoms
+  torsion_fitting                 COMPLETED     0.000s  No rotatable bonds to scan
+
+============================================================
