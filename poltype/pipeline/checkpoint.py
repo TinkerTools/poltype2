@@ -15,9 +15,6 @@ the working directory.  It records:
 Heavy artefacts (coordinates, ESP grids, …) are **not** serialised —
 only the stage names and statuses.  On resume the runner simply skips
 stages that are already recorded as ``COMPLETED`` in the checkpoint.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

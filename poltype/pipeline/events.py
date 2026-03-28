@@ -12,9 +12,6 @@ Usage::
 
     bus = EventBus()
     bus.register(lambda data: print(data.event, data.stage_name))
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

@@ -13,9 +13,6 @@ Design goals
 * **Immutable updates** – methods that modify geometry return a *new*
   ``Molecule`` rather than mutating in place.
 
-This module has **no dependency on PoltypeModules** and can be unit-tested
-in isolation.
-
 Example::
 
     from poltype.molecule import Molecule

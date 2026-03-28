@@ -256,7 +256,31 @@ Liu, C.; Piquemal, J. P.; Ren, P., Implementation of Geometry-Dependent Charge F
 
 ### Developer Notes
 
+#### Pipeline Stages
+
+The parameterisation workflow is implemented as a 10-stage pipeline
+(see `poltype/pipeline/factory.py`):
+
+1. **InputPreparationStage** — Load molecule, assign charges
+2. **GeometryOptimizationStage** — QM geometry optimisation
+3. **ESPFittingStage** — ESP grid computation
+4. **MultipoleStage** — Distributed multipole analysis
+5. **AtomTypingStage** — SMARTS-based atom typing
+6. **DatabaseMatchStage** — Parameter database lookup
+7. **FragmentationStage** — Molecular fragmentation
+8. **TorsionFittingStage** — Torsion scanning and fitting
+9. **ValidationStage** — Energy convergence and RMSD checks
+10. **FinalizationStage** — Write output files
+
+Each stage inherits from `poltype.pipeline.stage.Stage` and communicates
+via the artifact dictionary in `poltype.pipeline.context.PipelineContext`.
+
 #### SMARTS Parameter Database
 
-* Poltype generates a file called database.prm that outputs derived torsion parameters in a format that is compatible with poltype database file (under ParameterFiles folder) called externalparameterdatabase.txt
-* SMARTS strings above the # DELIMITER line, do not have the requirement of every atom in the match (1 for vdw, 2 for bond, 3 for angle, 4 for torsion) and its neighbors need to match the SMARTS. Below the # DELIMITER line, it is required that first neighbors of each atom also match to the SMARTS. Add new torsion parameter lines to the bottom of the file.
+* Poltype generates a `database.prm` file containing derived torsion
+  parameters in a format compatible with `ParameterFiles/externalparameterdatabase.txt`.
+* SMARTS strings above the `# DELIMITER` line do not require every atom in
+  the match (1 for vdW, 2 for bond, 3 for angle, 4 for torsion) and its
+  neighbours to match.  Below the delimiter, first neighbours of each atom
+  must also match.  Add new torsion parameter lines to the bottom of the
+  file.

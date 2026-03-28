@@ -5,9 +5,6 @@ Every pipeline stage inherits from :class:`Stage` and implements the
 ``execute`` method.  The :class:`StageResult` dataclass carries the
 outcome of a single stage execution, including an ``artifacts`` dict
 that downstream stages can consume.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

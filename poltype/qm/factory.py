@@ -29,7 +29,7 @@ def select_backend(
     """Instantiate the correct :class:`QMBackend` based on *config*.
 
     Selection logic mirrors the legacy ``if self.use_gaus … elif … else``
-    chain in ``PoltypeModules/optimization.py``:
+    chain:
 
     1. If ``config.qm.use_gaus`` or ``config.qm.use_gaus_opt_only`` is
        ``True`` → :class:`~poltype.qm.gaussian_backend.GaussianBackend`.

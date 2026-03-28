@@ -3,9 +3,6 @@ poltype.errors – custom exception hierarchy.
 
 All Poltype-specific exceptions inherit from :class:`PoltypeError` so
 callers can catch a single base class when they want a broad handler.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

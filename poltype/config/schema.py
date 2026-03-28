@@ -23,17 +23,11 @@ from typing import List, Literal, Optional
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _PARAM_DIR = _REPO_ROOT / "ParameterFiles"
-_MODULE_DIR = _REPO_ROOT / "PoltypeModules"
 
 
 def _param(filename: str) -> str:
     """Return absolute path string for a file under ParameterFiles/."""
     return str(_PARAM_DIR / filename)
-
-
-def _module(subpath: str) -> str:
-    """Return absolute path string for a file under PoltypeModules/."""
-    return str(_MODULE_DIR / subpath)
 
 
 # ---------------------------------------------------------------------------
@@ -155,22 +149,22 @@ class PoltypeConfig:
     parameter_files_path: str = str(_PARAM_DIR)
 
     # AMOEBA+ paths
-    amoeba_plus_nonbonded_prm: str = _module(
+    amoeba_plus_nonbonded_prm: str = _param(
         "lDatabaseParser/prm/amoebaplusNonbonded.prm"
     )
-    amoeba_plus_nonbonded_dat: str = _module(
+    amoeba_plus_nonbonded_dat: str = _param(
         "lDatabaseParser/dat/amoebaplusNonbondedType.dat"
     )
-    ldatabaseparser_path: str = _module(
+    ldatabaseparser_path: str = _param(
         "lDatabaseParser/lAssignAMOEBAplusPRM.py"
     )
-    ldatabaseparser_prm_dir: str = _module("lDatabaseParser/prm")
+    ldatabaseparser_prm_dir: str = _param("lDatabaseParser/prm")
 
     # AMOEBA small-molecule libraries
     small_molecule_prm_lib: str = _param("amoeba09.prm")
     latest_small_molecule_prm_lib: str = _param("amoeba21.prm")
     latest_small_molecule_polarize_prm_lib: str = _param("amoeba21polarize.prm")
-    updated_small_molecule_polarize_prm_lib: str = _module(
+    updated_small_molecule_polarize_prm_lib: str = _param(
         "lDatabaseParser/prm/polarize.prm"
     )
     small_molecule_mm3_prm_lib: str = _param("mm3.prm")

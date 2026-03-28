@@ -4,9 +4,6 @@ poltype.output.writer – abstract base class for output writers.
 Every output writer inherits from :class:`OutputWriter` and implements
 the ``write`` method.  Writers receive the pipeline context (including
 all artifacts) and produce a single output file.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

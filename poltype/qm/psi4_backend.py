@@ -1,10 +1,8 @@
 """
 poltype.qm.psi4_backend – Psi4 QM backend adapter (stub).
 
-This module provides the :class:`Psi4Backend` class that wraps the
-existing Psi4 input-file generation and execution logic found in
-``PoltypeModules/optimization.py``, ``electrostaticpotential.py``, and
-``torsiongenerator.py``.
+This module provides the :class:`Psi4Backend` class that wraps
+Psi4 input-file generation and execution logic.
 
 Phase 1 status: **stub adapter** – the class satisfies the
 :class:`~poltype.qm.backend.QMBackend` interface and delegates to the
@@ -32,8 +30,7 @@ from poltype.qm.backend import (
 class Psi4Backend(QMBackend):
     """Psi4-based QM backend.
 
-    Delegates to the legacy ``PoltypeModules/optimization.py`` functions
-    in Phase 1.  Subsequent phases will move the Psi4-specific logic
+    Subsequent phases will move the Psi4-specific logic
     into this class directly.
 
     Parameters
@@ -81,7 +78,7 @@ class Psi4Backend(QMBackend):
         """
         raise NotImplementedError(
             "Psi4Backend.optimize_geometry is a Phase 1 stub. "
-            "Use PoltypeModules/optimization.py directly for now."
+            "Not yet implemented."
         )
 
     def compute_esp_grid(
@@ -97,7 +94,7 @@ class Psi4Backend(QMBackend):
         """
         raise NotImplementedError(
             "Psi4Backend.compute_esp_grid is a Phase 1 stub. "
-            "Use PoltypeModules/electrostaticpotential.py directly."
+            "Not yet implemented."
         )
 
     def torsion_scan(
@@ -115,7 +112,7 @@ class Psi4Backend(QMBackend):
         """
         raise NotImplementedError(
             "Psi4Backend.torsion_scan is a Phase 1 stub. "
-            "Use PoltypeModules/torsiongenerator.py directly."
+            "Not yet implemented."
         )
 
     def compute_wbo_matrix(
@@ -131,5 +128,5 @@ class Psi4Backend(QMBackend):
         """
         raise NotImplementedError(
             "Psi4Backend.compute_wbo_matrix is a Phase 1 stub. "
-            "Use PoltypeModules/fragmenter.py directly."
+            "Not yet implemented."
         )
