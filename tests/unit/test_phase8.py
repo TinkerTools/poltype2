@@ -587,7 +587,7 @@ class TestFragmentationStage:
 class TestBuildDefaultPipelinePhase8:
     def test_has_nine_stages(self):
         runner = build_default_pipeline()
-        assert len(runner._stages) == 9
+        assert len(runner._stages) == 10
 
     def test_stage_order(self):
         runner = build_default_pipeline()
@@ -601,6 +601,7 @@ class TestBuildDefaultPipelinePhase8:
             "database_match",
             "fragmentation",
             "torsion_fitting",
+            "validation",
             "finalization",
         ]
 
@@ -658,7 +659,7 @@ class TestFullPipelineWithFragmentation:
         assert isinstance(result, FragmentResult)
 
     def test_all_nine_stages_complete(self, tmp_path):
-        """All 9 stages complete in a full pipeline run."""
+        """All 10 stages complete in a full pipeline run."""
         mol = _make_ethanol()
         config = PoltypeConfig(
             small_molecule_smarts_to_tinker_class="/nonexistent_smarts.txt"
@@ -669,7 +670,7 @@ class TestFullPipelineWithFragmentation:
         )
         runner = build_default_pipeline()
         ctx = runner.run(ctx)
-        assert len(ctx.stage_results) == 9
+        assert len(ctx.stage_results) == 10
         for sr in ctx.stage_results.values():
             assert sr.status is StageStatus.COMPLETED
 

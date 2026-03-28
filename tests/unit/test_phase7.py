@@ -592,7 +592,7 @@ class TestDatabaseMatchStage:
 class TestBuildDefaultPipelinePhase7:
     def test_has_eight_stages(self):
         runner = build_default_pipeline()
-        assert len(runner._stages) == 9
+        assert len(runner._stages) == 10
 
     def test_stage_order(self):
         runner = build_default_pipeline()
@@ -606,6 +606,7 @@ class TestBuildDefaultPipelinePhase7:
             "database_match",
             "fragmentation",
             "torsion_fitting",
+            "validation",
             "finalization",
         ]
 
@@ -790,12 +791,11 @@ class TestFullPipelineWithTyping:
         )
         runner = build_default_pipeline()
         ctx = runner.run(ctx)
-        assert len(ctx.stage_results) == 9
+        assert len(ctx.stage_results) == 10
         for sr in ctx.stage_results.values():
             assert sr.status is StageStatus.COMPLETED
 
     def test_output_files_use_typed_atoms(self, tmp_path):
-        """Output files reflect assigned atom types."""
         mol = _make_ethanol()
         config = PoltypeConfig(
             small_molecule_smarts_to_tinker_class="/nonexistent_smarts.txt"

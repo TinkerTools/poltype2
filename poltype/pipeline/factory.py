@@ -2,7 +2,7 @@
 poltype.pipeline.factory – default pipeline construction.
 
 The :func:`build_default_pipeline` function assembles a
-:class:`PipelineRunner` with the standard nine-stage sequence that
+:class:`PipelineRunner` with the standard ten-stage sequence that
 mirrors the monolithic ``GenerateParameters()`` method.
 
 Usage::
@@ -28,6 +28,7 @@ from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
 from poltype.pipeline.stages.input_prep import InputPreparationStage
 from poltype.pipeline.stages.multipole import MultipoleStage
 from poltype.pipeline.stages.torsion import TorsionFittingStage
+from poltype.pipeline.stages.validation import ValidationStage
 
 
 def build_default_pipeline() -> PipelineRunner:
@@ -43,7 +44,8 @@ def build_default_pipeline() -> PipelineRunner:
     6. :class:`DatabaseMatchStage`
     7. :class:`FragmentationStage`
     8. :class:`TorsionFittingStage`
-    9. :class:`FinalizationStage` (with default output writers)
+    9. :class:`ValidationStage`
+    10. :class:`FinalizationStage` (with default output writers)
 
     Returns
     -------
@@ -71,5 +73,6 @@ def build_default_pipeline() -> PipelineRunner:
         .add_stage(DatabaseMatchStage())
         .add_stage(FragmentationStage())
         .add_stage(TorsionFittingStage())
+        .add_stage(ValidationStage())
         .add_stage(FinalizationStage(writers=writers))
     )

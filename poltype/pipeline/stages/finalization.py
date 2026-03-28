@@ -93,6 +93,13 @@ class FinalizationStage(Stage):
             summary["torsion_bonds_scanned"] = len(torsion_scans)
             collected.append("torsion_scans")
 
+        validation_report = context.get_artifact("validation_report")
+        if validation_report is not None:
+            summary["validation_passed"] = validation_report.num_passed
+            summary["validation_failed"] = validation_report.num_failed
+            summary["validation_all_passed"] = validation_report.all_passed
+            collected.append("validation_report")
+
         summary["collected_artifacts"] = collected
 
         # --- run output writers ---
