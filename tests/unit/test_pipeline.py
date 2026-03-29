@@ -451,11 +451,21 @@ class TestMultipoleStage:
         assert result.status is StageStatus.FAILED
         assert "No molecule" in result.message
 
-    def test_execute_completes_without_esp_data(self, context_with_molecule):
+    def test_execute_completes_with_molecule_and_backend(self, context_with_molecule):
+        # MultipoleStage now requires a backend for DMA computation
+        from unittest.mock import MagicMock
+        context_with_molecule._backend = MagicMock()
+        context_with_molecule._backend.name = "mock"
         stage = MultipoleStage()
         result = stage.execute(context_with_molecule)
         assert result.status is StageStatus.COMPLETED
-        assert "No ESP data" in result.message
+        assert "multipole_frames" in result.artifacts
+
+    def test_execute_fails_without_backend(self, context_with_molecule):
+        stage = MultipoleStage()
+        result = stage.execute(context_with_molecule)
+        assert result.status is StageStatus.FAILED
+        assert "No QM backend" in result.message
 
     def test_should_skip_when_database_match_only(self, default_config):
         default_config.database_match_only = True

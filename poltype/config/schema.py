@@ -52,6 +52,7 @@ class QMConfig:
     opt_loose: bool = True
 
     # --- DMA multipole ---
+    dma_method: str = "MP2"
     dma_basis_set: str = "6-311G**"
     dma_basis_set_file: str = "6-311g_st__st_.0.gbs"
 

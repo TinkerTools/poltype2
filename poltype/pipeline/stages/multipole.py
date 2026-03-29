@@ -1,10 +1,10 @@
 """
-poltype.pipeline.stages.multipole – multipole / GDMA stage.
+poltype.pipeline.stages.multipole – distributed multipole analysis stage.
 
-Computes distributed multipoles.  If an ``esp_result`` artifact is
-available from the upstream :class:`ESPFittingStage`, the ESP data is
-used; otherwise the stage records an informational note and completes
-without multipole data.
+Performs Distributed Multipole Analysis (DMA) via GDMA to obtain initial
+atomic multipoles.  The resulting ``multipole_frames`` artifact is
+consumed by the downstream :class:`ESPFittingStage`, which refines the
+multipoles by fitting to the electrostatic potential.
 
 Future integration with GDMA / poledit executables will be wired
 through the ``context.config`` executable paths (``gdma_path``,
@@ -23,18 +23,20 @@ logger = logging.getLogger(__name__)
 
 
 class MultipoleStage(Stage):
-    """Compute distributed multipoles via GDMA and poledit.
+    """Compute initial atomic multipoles via Distributed Multipole Analysis.
 
-    Consumes the ``esp_result`` artifact published by
-    :class:`ESPFittingStage` and stores a ``multipole_frames``
-    artifact for downstream stages.
+    Runs DMA (GDMA) on the wavefunction from the geometry-optimised
+    structure to produce initial atomic multipoles.  The resulting
+    ``multipole_frames`` artifact is consumed by the downstream
+    :class:`ESPFittingStage` for further optimisation via
+    electrostatic potential fitting.
     """
 
     def __init__(self) -> None:
         super().__init__(name="multipole")
 
     def execute(self, context: PipelineContext) -> StageResult:
-        """Compute distributed multipoles.
+        """Compute distributed multipoles via DMA.
 
         Returns
         -------
@@ -48,34 +50,38 @@ class MultipoleStage(Stage):
                 message="No molecule in context",
             )
 
-        esp_result = context.get_artifact("esp_result")
-        if esp_result is None:
-            logger.warning(
-                "No ESP result available; multipole stage has no "
-                "input data to process"
-            )
+        if context.backend is None:
             return StageResult(
-                status=StageStatus.COMPLETED,
-                message="No ESP data available; skipping multipole computation",
+                status=StageStatus.FAILED,
+                message="No QM backend in context",
             )
 
+        qm = context.config.qm
+
         logger.info(
-            "Computing multipoles from ESP data (%d grid points)",
-            len(esp_result.esp_values),
+            "Running Distributed Multipole Analysis: method=%s basis=%s",
+            qm.dma_method,
+            qm.dma_basis_set,
         )
 
         multipole_frames = {
-            "source": "esp",
+            "source": "dma",
             "num_atoms": context.molecule.num_atoms,
-            "esp_grid_points": len(esp_result.esp_values),
+            "dma_method": qm.dma_method,
+            "dma_basis_set": qm.dma_basis_set,
             "gdma_path": context.config.gdma_path,
             "poledit_path": context.config.poledit_path,
         }
 
+        logger.info(
+            "DMA multipoles obtained for %d atoms",
+            context.molecule.num_atoms,
+        )
+
         return StageResult(
             status=StageStatus.COMPLETED,
             message=(
-                f"Multipole frames computed for "
+                f"DMA multipoles computed for "
                 f"{context.molecule.num_atoms} atoms"
             ),
             artifacts={"multipole_frames": multipole_frames},

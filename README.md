@@ -113,8 +113,8 @@ Poltype2 uses a modular 10-stage pipeline:
 |---|-------|-------------|
 | 1 | **Input Preparation** | Load molecule, assign charges, validate structure |
 | 2 | **Geometry Optimisation** | QM geometry optimisation (MP2/6-31G*) |
-| 3 | **ESP Fitting** | Electrostatic potential grid computation |
-| 4 | **Multipole** | Distributed multipole analysis (GDMA) |
+| 3 | **Multipole** | Distributed multipole analysis (DMA) for initial atomic multipoles |
+| 4 | **ESP Fitting** | Electrostatic potential fitting to optimise multipoles |
 | 5 | **Atom Typing** | SMARTS-based atom type assignment |
 | 6 | **Database Match** | Look up existing parameters |
 | 7 | **Fragmentation** | Fragment large molecules for torsion scanning |

@@ -127,9 +127,10 @@ class KeyFileWriter(OutputWriter):
         # Multipole frames placeholder (if available)
         multipole_frames = context.get_artifact("multipole_frames")
         if multipole_frames is not None:
-            lines.append("# Multipole frames computed from ESP data")
+            lines.append("# Multipole frames from DMA (distributed multipole analysis)")
             lines.append(
-                f"# ESP grid points: {multipole_frames.get('esp_grid_points', 'N/A')}"
+                f"# DMA method: {multipole_frames.get('dma_method', 'N/A')}"
+                f"  basis: {multipole_frames.get('dma_basis_set', 'N/A')}"
             )
             lines.append("")
 
