@@ -125,41 +125,40 @@
 
 * **Figure 3** Overview of fragmentation scheme used to obtain torsion parameters for a parent molecule. For the atoms a-b-c-d-e (tor-tor fragments), the rotatable bonds would be b-c and c-d, rather than just b-c for the single torsion a-b-c-d (torsion fragments). Each time fragments are grown, any hydrogens and aromatic rings that are attached are added. Then any bonds cut between new fragment and parent are hydrated. The decision block involves comparing the relative WBO from best fragment to a WBO tolerance to determine if algorithm should continue or exit.
 
-* Quantum computations scale polynomially with increasing basis set size in one’s system, where the degree of scaling varies depending on the QM method. 
-* Furthermore, van der Waals, torsion, and torsion-torsion parameterization require many QM optimizations and single point computations, thus necessitating the need to use smaller fragments to derive torsion and van der Waals parameters. 
-* Additionally, some large molecules will have very poor fits due to steric forces from other parts of the molecule. 
+* Quantum computations scale polynomially with increasing basis set size in one's system, where the degree of scaling varies depending on the QM method.
+* Furthermore, van der Waals, torsion, and torsion-torsion parameterization require many QM optimizations and single point computations, thus necessitating the need to use smaller fragments to derive torsion and van der Waals parameters.
+* Additionally, some large molecules will have very poor fits due to steric forces from other parts of the molecule.
 * However, we want to ensure that the electron density in the parent molecule nearby the innermost rotatable bond (b-c in torsion a-b-c-d) is similar to the electron density of the fragment for the same bond.
-* The fragmentation library implements the Wiberg bond order as a proxy for electron density near rotatable bonds of interest, similar to OpenFF’s algorithm. The relative Wiberg bond order (WBO) between parent and fragment is used as a cost function to obtain the optimal fragment. * A relative WBO of 0 would signify the electron density in the region of the rotatable bond is very similar to the parent density in that region. 
-* The algorithm begins with a list of torsions, VdW, and torsion-torsions to be parameterized. 
-* For each input list of atom indices, if the atom indices are aromatic or rotatable bond torsions, then all neighbors of each atom are included as an initial fragment. 
-* Any aromatic rings or singly valent atoms attached to the listed atoms or their neighbors are included in the initial fragment. 
-* The aromatic rings should not be broken due to the importance of how the pi electrons interact with electron density near the rotatable bond. 
-* The singly valent atoms are included since only rotatable bonds are chosen as growth directions from the initial guess fragment. 
-* Any cut bonds from the parent are hydrated. 
-* An optional keyword will enable non-aromatic ring fragments for 1D torsion scanning. These non-aromatic ring fragments will be constructed from detecting rings and then cutting bonds on the ring appropriate to enable 1D torsion scanning. 
-* Van der Waals and non-aromatic initial fragments are used for parameterization, but torsion and torsion-torsion fragments are allowed to grow larger due to higher sensitivity of the parameters to the surrounding chemical environment. This scheme is illustrated in **Fig 3**, with an example torsion fragment show in **Fig 4**. 
 
-* After producing the initial fragment, all cut bonds from the parent determine which growth directions are possible. 
+#### Rule-Based Fragmenter (default)
+
+* The default `RuleBasedFragmenter` uses chemical rules to trim fragments around each rotatable bond, without requiring WBO data from a QM calculation.
+* Key rules: (1) all single bonds between heavy atoms and C-C double/aromatic bonds may be cut; (2) bonds involving divalent nitrogen (`[#7X2]`) are never cut; (3) bonds in the immediate neighbourhood of the rotatable bond are never cut; (4) non-ring neighbours of aromatic atoms outside the torsion region are removed; (5) distant fused rings are removed when they do not share a ring with the torsion atoms.
+* An optional keyword `nonaroringtor1dscan` will enable non-aromatic ring fragments for 1D torsion scanning. These non-aromatic ring fragments will be constructed from detecting rings and then cutting bonds on the ring appropriate to enable 1D torsion scanning.
+
+#### WBO-Guided Fragmenter (optional)
+
+* The `WBOFragmenter` uses Wiberg Bond Orders as a proxy for electron density near rotatable bonds, similar to OpenFF's algorithm. The relative Wiberg bond order (WBO) between parent and fragment is used as a cost function to obtain the optimal fragment. A relative WBO of 0 would signify the electron density in the region of the rotatable bond is very similar to the parent density in that region.
+* The algorithm begins with a list of torsions, VdW, and torsion-torsions to be parameterized.
+* For each input list of atom indices, if the atom indices are aromatic or rotatable bond torsions, then all neighbors of each atom are included as an initial fragment.
+* Any aromatic rings or singly valent atoms attached to the listed atoms or their neighbors are included in the initial fragment.
+* The aromatic rings should not be broken due to the importance of how the pi electrons interact with electron density near the rotatable bond.
+* The singly valent atoms are included since only rotatable bonds are chosen as growth directions from the initial guess fragment.
+* Any cut bonds from the parent are hydrated.
+* Van der Waals and non-aromatic initial fragments are used for parameterization, but torsion and torsion-torsion fragments are allowed to grow larger due to higher sensitivity of the parameters to the surrounding chemical environment. This scheme is illustrated in **Fig 3**, with an example torsion fragment show in **Fig 4**.
+
+* After producing the initial fragment, all cut bonds from the parent determine which growth directions are possible.
 * All combinations of possible directions to grow are then generated.
-* For each combination of growth directions, a fragment is made which includes any attached aromatics or singly valent atoms attached. 
-* Any bonds cut from the parent are hydrated. 
-* The relative WBO is computed for each fragment HF/MINIX where MINIX is a minimal basis set; the one with the minimum value is chosen as the optimal fragment for this iteration of growth. 
-* The parent coordinates are used for the fragment to eliminate conformational WBO dependence of the loss function. The WBO of the optimal fragment is then compared to the tolerance value (default of 0.05). 
-* If the relative WBO is smaller than or equal to the tolerance value, the algorithm terminates; otherwise, it continues growing until the tolerance threshold is reached or a max number of growth cycles is achieved (default of 4). 
-* After all fragments are generated, input files and structures are prepared and the Poltype jobs are submitted. By default, Poltype computes the number of fragment jobs to run in parallel as the floor function of the input number of cores divided by the number of cores per job (default of 2). 
-* RAM, cores, and disk space can all be detected and a consumption ratio of 80% is used by default. Fragment RAM, disk, and cores are divided evenly by the number of Poltype jobs in parallel. 
-* After all, Poltype fragment jobs have completed, parameters for Van der Waals, torsion, and torsion-torsion are transferred back to the parent molecule Tinker key file. 
-* If Van der Waals parameterization is enabled, then Van der Waals fragments are first parameterized and then parameters are transferred back to the parent, so that next the torsion fragments can use the newly refined Van der Waals parameters from the parent molecule. 
+* For each combination of growth directions, a fragment is made which includes any attached aromatics or singly valent atoms attached.
+* Any bonds cut from the parent are hydrated.
+* The relative WBO is computed for each fragment HF/MINIX where MINIX is a minimal basis set; the one with the minimum value is chosen as the optimal fragment for this iteration of growth.
+* The parent coordinates are used for the fragment to eliminate conformational WBO dependence of the loss function. The WBO of the optimal fragment is then compared to the tolerance value (default of 0.05).
+* If the relative WBO is smaller than or equal to the tolerance value, the algorithm terminates; otherwise, it continues growing until the tolerance threshold is reached or a max number of growth cycles is achieved (default of 5).
+* After all fragments are generated, input files and structures are prepared and the Poltype jobs are submitted. By default, Poltype computes the number of fragment jobs to run in parallel as the floor function of the input number of cores divided by the number of cores per job (default of 2).
+* RAM, cores, and disk space can all be detected and a consumption ratio of 80% is used by default. Fragment RAM, disk, and cores are divided evenly by the number of Poltype jobs in parallel.
+* After all Poltype fragment jobs have completed, parameters for Van der Waals, torsion, and torsion-torsion are transferred back to the parent molecule Tinker key file.
+* If Van der Waals parameterization is enabled, then Van der Waals fragments are first parameterized and then parameters are transferred back to the parent, so that next the torsion fragments can use the newly refined Van der Waals parameters from the parent molecule.
 * Unique SMARTS strings are generated for parameterized fragments that can be added to the fragment database. Van der Waals parameters used for each atom in the torsion fragment are also associated with the torsion SMARTS string parameters in the database.
-
-
-
-
-<img src="Images/FragExample.PNG" width="70%">
-
-
-* **Figure 4** **A.**  The IN17 molecule that was  given as input to the fragmenter. **B.** The inital fragment growth of bond 1-16 in the parent molecule. (The bond 3-2 in the fragment is equivalent to bond 1-16 in the parent). 
-
 
 ### Van der Waals Refinement
 * Van der Waals parameters are important for accurate predictions of molecular interactions, such as absolute hydration free energy computation. 

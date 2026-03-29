@@ -96,6 +96,7 @@ Options:
   -c, --config       Path to poltype.ini (default: poltype.ini)
   -w, --work-dir     Working directory for output (default: current dir)
   -v, --verbose      Enable verbose/debug logging
+  -q, --quiet        Suppress all output except warnings and errors
   --resume           Resume from the last checkpoint
   --no-checkpoint    Disable checkpoint saving
   --dry-run          Validate inputs without running QM jobs
@@ -178,11 +179,12 @@ poltype2/
 
 ## Validation Checks
 
-After parameterisation, Poltype automatically validates:
+After parameterisation, the `ValidationStage` runs `EnergyValidator` checks:
 
-* Refined multipoles reproduce QM electrostatic potential
-* QM and MM dipoles are consistent
-* Final MM-minimised structure matches QM-optimised geometry
-* No missing van der Waals or multipole parameters
-* No zeroed-out torsion parameters in the final key file
+* Geometry optimisation energy is finite and the run converged
+* Torsion energy range is within 50 kcal/mol (configurable)
+* QM vs MM torsion RMSD is below 3 kcal/mol (configurable)
+
+Validation is skipped automatically when `config.skip_validation = True`
+or when `--dry-run` is active.
 
