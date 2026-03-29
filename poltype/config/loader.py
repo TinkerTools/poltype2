@@ -174,6 +174,10 @@ def load_config(
             qm.opt_convergence = "LOOSE"
     if "dmabasissetfile" in raw:
         qm.dma_basis_set_file = _parse_str(raw["dmabasissetfile"])
+    if "dmamethod" in raw:
+        qm.dma_method = _parse_str(raw["dmamethod"])
+    if "dmabasisset" in raw:
+        qm.dma_basis_set = _parse_str(raw["dmabasisset"])
     if "espmethod" in raw:
         qm.esp_method = _parse_str(raw["espmethod"])
     if "espbasisset" in raw:

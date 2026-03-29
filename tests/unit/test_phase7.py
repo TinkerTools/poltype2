@@ -600,8 +600,8 @@ class TestBuildDefaultPipelinePhase7:
         assert names == [
             "input_preparation",
             "geometry_optimization",
-            "esp_fitting",
             "multipole",
+            "esp_fitting",
             "atom_typing",
             "database_match",
             "fragmentation",

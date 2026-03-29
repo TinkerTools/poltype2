@@ -418,12 +418,13 @@ class TestKeyFileWriter:
             grid_coords=np.zeros((10, 3)), esp_values=np.zeros(10),
         ))
         ctx.set_artifact("multipole_frames", {
-            "source": "esp", "esp_grid_points": 10,
+            "source": "dma", "dma_method": "MP2", "dma_basis_set": "6-311G**",
         })
         w = KeyFileWriter()
         path = w.write(ctx)
         content = path.read_text()
         assert "Multipole frames" in content
+        assert "DMA" in content
 
     def test_torsion_annotation_when_present(self, tmp_path):
         ctx = _make_context(tmp_path)

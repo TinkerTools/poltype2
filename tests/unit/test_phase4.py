@@ -4,8 +4,9 @@ tests/unit/test_phase4.py – unit tests for Phase 4: stage implementations.
 Tests cover:
 - GeometryOptimizationStage: delegates to backend, updates molecule,
   handles convergence failure and backend errors.
-- ESPFittingStage: delegates to backend, stores ESP artifact.
-- MultipoleStage: consumes ESP artifact, produces multipole frames.
+- MultipoleStage: runs DMA to produce initial multipole frames.
+- ESPFittingStage: delegates to backend, stores ESP artifact, optimises
+  multipoles from the upstream MultipoleStage.
 - TorsionFittingStage: iterates rotatable bonds, collects scan results.
 - FinalizationStage: assembles summary from upstream artifacts.
 - Full pipeline run with a mock backend.
@@ -299,37 +300,29 @@ class TestESPFittingExecute:
 
 
 class TestMultipoleExecute:
-    def test_completes_with_esp_artifact(self, context_with_backend):
-        # First run ESP to produce the artifact
-        esp_stage = ESPFittingStage()
-        esp_result = esp_stage.execute(context_with_backend)
-        context_with_backend.artifacts.update(esp_result.artifacts)
-
+    def test_completes_with_backend(self, context_with_backend):
         stage = MultipoleStage()
         result = stage.execute(context_with_backend)
         assert result.status is StageStatus.COMPLETED
         assert "multipole_frames" in result.artifacts
 
     def test_multipole_frames_content(self, context_with_backend):
-        esp_stage = ESPFittingStage()
-        esp_result = esp_stage.execute(context_with_backend)
-        context_with_backend.artifacts.update(esp_result.artifacts)
-
         stage = MultipoleStage()
         result = stage.execute(context_with_backend)
         frames = result.artifacts["multipole_frames"]
-        assert frames["source"] == "esp"
+        assert frames["source"] == "dma"
         assert frames["num_atoms"] == context_with_backend.molecule.num_atoms
-
-    def test_completes_without_esp_data(self, context_with_backend):
-        stage = MultipoleStage()
-        result = stage.execute(context_with_backend)
-        assert result.status is StageStatus.COMPLETED
-        assert "No ESP data" in result.message
-        assert "multipole_frames" not in result.artifacts
+        assert frames["dma_method"] == "MP2"
+        assert frames["dma_basis_set"] == "6-311G**"
 
     def test_fails_when_no_molecule(self, default_config, mock_backend):
         ctx = PipelineContext(config=default_config, backend=mock_backend)
+        stage = MultipoleStage()
+        result = stage.execute(ctx)
+        assert result.status is StageStatus.FAILED
+
+    def test_fails_when_no_backend(self, default_config, methane):
+        ctx = PipelineContext(config=default_config, molecule=methane)
         stage = MultipoleStage()
         result = stage.execute(ctx)
         assert result.status is StageStatus.FAILED
@@ -436,7 +429,7 @@ class TestFinalizationExecute:
         assert summary["torsion_bonds_scanned"] == 1
 
     def test_collects_multipole_frames(self, context_with_backend):
-        frames = {"source": "esp", "num_atoms": 5}
+        frames = {"source": "dma", "num_atoms": 5}
         context_with_backend.set_artifact("multipole_frames", frames)
         stage = FinalizationStage()
         result = stage.execute(context_with_backend)
@@ -554,5 +547,5 @@ class TestFullPipelineWithMockBackend:
             result.stage_results["geometry_optimization"].status
             is StageStatus.FAILED
         )
-        # Pipeline should stop — no esp_fitting result
-        assert "esp_fitting" not in result.stage_results
+        # Pipeline should stop — no multipole result
+        assert "multipole" not in result.stage_results

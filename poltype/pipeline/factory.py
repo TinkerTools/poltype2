@@ -35,8 +35,8 @@ def build_default_pipeline() -> PipelineRunner:
 
     1. :class:`InputPreparationStage`
     2. :class:`GeometryOptimizationStage`
-    3. :class:`ESPFittingStage`
-    4. :class:`MultipoleStage`
+    3. :class:`MultipoleStage`  — DMA to obtain initial atomic multipoles
+    4. :class:`ESPFittingStage` — ESP fitting to optimise multipoles
     5. :class:`AtomTypingStage`
     6. :class:`DatabaseMatchStage`
     7. :class:`FragmentationStage`
@@ -64,8 +64,8 @@ def build_default_pipeline() -> PipelineRunner:
         PipelineRunner()
         .add_stage(InputPreparationStage())
         .add_stage(GeometryOptimizationStage())
-        .add_stage(ESPFittingStage())
         .add_stage(MultipoleStage())
+        .add_stage(ESPFittingStage())
         .add_stage(AtomTypingStage())
         .add_stage(DatabaseMatchStage())
         .add_stage(FragmentationStage())

@@ -262,8 +262,8 @@ The parameterisation workflow is implemented as a 10-stage pipeline
 
 1. **InputPreparationStage** — Load molecule, assign charges
 2. **GeometryOptimizationStage** — QM geometry optimisation
-3. **ESPFittingStage** — ESP grid computation
-4. **MultipoleStage** — Distributed multipole analysis
+3. **MultipoleStage** — Distributed multipole analysis (DMA) for initial atomic multipoles
+4. **ESPFittingStage** — ESP fitting to optimise multipoles
 5. **AtomTypingStage** — SMARTS-based atom typing
 6. **DatabaseMatchStage** — Parameter database lookup
 7. **FragmentationStage** — Molecular fragmentation
