@@ -18,7 +18,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem,Descriptors3D,rdFreeSASA,rdmolfiles,ChemicalForceFields
 
 
-def find_intramolecular_hbonds(mol, confId = -1, donorAtoms = [7,8,9], distTol = 2.5):
+def find_intramolecular_hbonds(mol, confId = -1, donorAtoms = [7,8,9], distTol = 2.8):
   res = []
   conf = mol.GetConformer(confId)
   for i in range(mol.GetNumAtoms()):
