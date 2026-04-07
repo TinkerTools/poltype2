@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Optional
 from poltype.database.match_result import DatabaseMatchResult
 from poltype.database.parameter_db import ParameterDatabase, SmallMoleculeDB
 from poltype.output.params import MultipoleParam, PolarizeParam
+from poltype.pipeline.parameter_utils import atom_type_for_index, torsion_indices_for_bond
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
 if TYPE_CHECKING:
@@ -116,9 +117,9 @@ class DatabaseMatchStage(Stage):
         type_map = _type_map(type_records)
         multipoles_by_type: dict[int, MultipoleParam] = {}
         for record in raw_records:
-            atom_type = _atom_type_for_index(record["atom_index"], type_map)
+            atom_type = atom_type_for_index(record["atom_index"], type_map)
             frame = [
-                _atom_type_for_index(frame_idx, type_map)
+                atom_type_for_index(frame_idx, type_map)
                 for frame_idx in record["frame_atom_indices"]
             ]
             multipoles_by_type.setdefault(
@@ -145,10 +146,10 @@ class DatabaseMatchStage(Stage):
         type_map = _type_map(type_records)
         polarization_by_type: dict[int, PolarizeParam] = {}
         for record in raw_records:
-            atom_type = _atom_type_for_index(record["atom_index"], type_map)
+            atom_type = atom_type_for_index(record["atom_index"], type_map)
             neighbor_types = sorted(
                 {
-                    _atom_type_for_index(neighbor_idx, type_map)
+                    atom_type_for_index(neighbor_idx, type_map)
                     for neighbor_idx in record["neighbor_atom_indices"]
                 }
             )
@@ -177,7 +178,7 @@ class DatabaseMatchStage(Stage):
         matched_atoms = set(result.matched_atom_indices)
         matched_torsions: set[tuple[int, int, int, int]] = set(result.matched_torsions)
         for bond in mol.rotatable_bonds:
-            torsion = _torsion_indices_for_bond(mol.rdmol, bond)
+            torsion = torsion_indices_for_bond(mol.rdmol, bond)
             if torsion is None:
                 continue
             if all(idx in matched_atoms for idx in torsion):
@@ -189,25 +190,3 @@ def _type_map(type_records) -> dict[int, int]:
     if not type_records:
         return {}
     return {record.atom_index: record.atom_type for record in type_records}
-
-
-def _atom_type_for_index(atom_index: int, type_map: dict[int, int]) -> int:
-    atom_type = type_map.get(atom_index, atom_index + 1)
-    return atom_type if atom_type != 0 else atom_index + 1
-
-
-def _torsion_indices_for_bond(rdmol, bond: tuple[int, int]) -> tuple[int, int, int, int] | None:
-    j, k = bond
-    left = sorted(
-        neighbor.GetIdx()
-        for neighbor in rdmol.GetAtomWithIdx(j).GetNeighbors()
-        if neighbor.GetIdx() != k
-    )
-    right = sorted(
-        neighbor.GetIdx()
-        for neighbor in rdmol.GetAtomWithIdx(k).GetNeighbors()
-        if neighbor.GetIdx() != j
-    )
-    if not left or not right:
-        return None
-    return (left[0], j, k, right[0])

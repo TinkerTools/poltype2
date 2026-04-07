@@ -22,6 +22,7 @@ from poltype.pipeline.context import PipelineContext
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
 logger = logging.getLogger(__name__)
+DEFAULT_THOLE = 0.3900
 
 
 class ESPFittingStage(Stage):
@@ -152,7 +153,7 @@ class ESPFittingStage(Stage):
                 {
                     "atom_index": atom_idx,
                     "alpha": _default_alpha(atom.GetAtomicNum()),
-                    "thole": 0.3900,
+                    "thole": DEFAULT_THOLE,
                     "neighbor_atom_indices": neighbor_indices,
                 }
             )

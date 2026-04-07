@@ -15,6 +15,7 @@ import numpy as np
 from poltype.errors import BackendError
 from poltype.output.params import TorsionFold, TorsionParam
 from poltype.pipeline.context import PipelineContext
+from poltype.pipeline.parameter_utils import atom_type_for_index, torsion_indices_for_bond
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
 logger = logging.getLogger(__name__)
@@ -152,19 +153,18 @@ class TorsionFittingStage(Stage):
         scans: Dict[Tuple[int, int], object],
     ) -> list[TorsionParam]:
         type_records = context.get_artifact("type_records") or []
-        type_map = {
-            record.atom_index: (record.atom_type if record.atom_type != 0 else record.atom_index + 1)
-            for record in type_records
-        }
+        type_map = {record.atom_index: record.atom_type for record in type_records}
 
         params_by_type: dict[tuple[int, int, int, int], TorsionParam] = {}
         rdmol = context.molecule.rdmol
         for bond, scan_result in scans.items():
-            torsion_indices = _torsion_indices_for_bond(rdmol, bond)
+            torsion_indices = torsion_indices_for_bond(rdmol, bond)
             if torsion_indices is None:
                 continue
 
-            atom_types = tuple(type_map.get(idx, idx + 1) for idx in torsion_indices)
+            atom_types = tuple(
+                atom_type_for_index(idx, type_map) for idx in torsion_indices
+            )
             params_by_type.setdefault(
                 atom_types,
                 TorsionParam(
@@ -174,25 +174,6 @@ class TorsionFittingStage(Stage):
             )
 
         return sorted(params_by_type.values(), key=lambda tp: tp.atom_types)
-
-
-def _torsion_indices_for_bond(rdmol, bond: tuple[int, int]) -> tuple[int, int, int, int] | None:
-    j, k = bond
-    left = sorted(
-        neighbor.GetIdx()
-        for neighbor in rdmol.GetAtomWithIdx(j).GetNeighbors()
-        if neighbor.GetIdx() != k
-    )
-    right = sorted(
-        neighbor.GetIdx()
-        for neighbor in rdmol.GetAtomWithIdx(k).GetNeighbors()
-        if neighbor.GetIdx() != j
-    )
-    if not left or not right:
-        return None
-    return (left[0], j, k, right[0])
-
-
 def _fit_torsion_folds(scan_result) -> list[TorsionFold]:
     energies = np.asarray(scan_result.energies, dtype=float)
     if energies.size == 0:
