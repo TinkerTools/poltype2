@@ -741,7 +741,7 @@ class TestExternalToolRunners:
         assert str(fchk_path) in inp
         assert "Punch" in inp
         assert str(punch_path) in inp
-        assert "quadrupole" in inp
+        assert "Limit 2" in inp
 
     def test_poledit_runner_construction(self):
         from poltype.external.poledit import PoleditRunner

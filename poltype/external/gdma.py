@@ -140,14 +140,12 @@ class GDMARunner:
         The input instructs GDMA to read the fchk file, analyse the
         density, and write the multipoles to a punch file.
         """
-        rank_name = {0: "charge", 1: "dipole", 2: "quadrupole", 3: "octopole", 4: "hexadecapole"}
-        limit = rank_name.get(multipole_rank, f"rank {multipole_rank}")
         return (
             f"Title \"DMA analysis\"\n"
             f"\n"
             f"File {fchk_path}\n"
             f"Multipoles\n"
-            f"  Limit {limit}\n"
+            f"  Limit {multipole_rank}\n"
             f"  Punch {punch_path}\n"
             f"Start\n"
             f"\n"
