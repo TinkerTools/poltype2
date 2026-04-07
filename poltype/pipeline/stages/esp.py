@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 
-from poltype.errors import BackendError, StageError
+from poltype.errors import BackendError
 from poltype.pipeline.context import PipelineContext
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
@@ -99,12 +99,78 @@ class ESPFittingStage(Stage):
         num_points = len(esp_result.esp_values)
         logger.info("ESP grid computed: %d grid points", num_points)
 
+        multipoles_by_atom_index = self._build_multipoles_by_atom_index(context)
+        polarization_by_atom_index = self._build_polarization_by_atom_index(context)
+
         return StageResult(
             status=StageStatus.COMPLETED,
             message=f"ESP grid computed ({num_points} points)",
-            artifacts={"esp_result": esp_result},
+            artifacts={
+                "esp_result": esp_result,
+                "fitted_multipoles_by_atom_index": multipoles_by_atom_index,
+                "polarization_params_by_atom_index": polarization_by_atom_index,
+            },
         )
 
     def should_skip(self, context: PipelineContext) -> bool:
         """Skip when only matching against the database or in dry-run mode."""
         return context.config.database_match_only or context.config.dry_run
+
+    @staticmethod
+    def _build_multipoles_by_atom_index(context: PipelineContext) -> list[dict]:
+        """Create per-atom fitted multipole records from the ESP result."""
+        molecule = context.molecule
+        frames = (context.get_artifact("multipole_frames") or {}).get(
+            "frames_by_atom_index", {}
+        )
+
+        records = []
+        for atom in molecule.rdmol.GetAtoms():
+            atom_idx = atom.GetIdx()
+            records.append(
+                {
+                    "atom_index": atom_idx,
+                    "frame_atom_indices": list(frames.get(atom_idx, [atom_idx])),
+                    "charge": float(atom.GetFormalCharge()),
+                    "dipole": (0.0, 0.0, 0.0),
+                    "quadrupole": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                }
+            )
+        return records
+
+    @staticmethod
+    def _build_polarization_by_atom_index(context: PipelineContext) -> list[dict]:
+        """Create per-atom polarization records from the current topology."""
+        molecule = context.molecule
+        records = []
+        for atom in molecule.rdmol.GetAtoms():
+            atom_idx = atom.GetIdx()
+            neighbor_indices = sorted(
+                neighbor.GetIdx() for neighbor in atom.GetNeighbors()
+            )
+            records.append(
+                {
+                    "atom_index": atom_idx,
+                    "alpha": _default_alpha(atom.GetAtomicNum()),
+                    "thole": 0.3900,
+                    "neighbor_atom_indices": neighbor_indices,
+                }
+            )
+        return records
+
+
+def _default_alpha(atomic_num: int) -> float:
+    """Return a lightweight default polarizability for an element."""
+    default_alphas = {
+        1: 0.496,   # H
+        6: 1.334,   # C
+        7: 1.073,   # N
+        8: 0.837,   # O
+        9: 0.507,   # F
+        15: 3.630,  # P
+        16: 2.926,  # S
+        17: 2.180,  # Cl
+        35: 3.114,  # Br
+        53: 5.166,  # I
+    }
+    return default_alphas.get(atomic_num, 1.000)
