@@ -3,12 +3,14 @@ poltype.pipeline.stages.geometry_opt – QM geometry optimisation stage.
 
 Delegates to :meth:`QMBackend.optimize_geometry` to run a QM geometry
 optimisation and updates the molecule in the pipeline context with the
-optimised coordinates.
+optimised coordinates.  On success, writes the optimised geometry to
+``{fname}_opt.xyz`` in the working directory.
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from poltype.errors import BackendError, StageError
 from poltype.pipeline.context import PipelineContext
@@ -22,7 +24,8 @@ class GeometryOptimizationStage(Stage):
 
     Calls :meth:`QMBackend.optimize_geometry` with the method and
     basis set from ``context.config.qm``, then replaces the molecule
-    in the context with one carrying the optimised coordinates.
+    in the context with one carrying the optimised coordinates and
+    writes the result to ``{fname}_opt.xyz``.
     """
 
     def __init__(self) -> None:
@@ -82,20 +85,73 @@ class GeometryOptimizationStage(Stage):
         new_mol = molecule.with_updated_coordinates(opt_result.coordinates)
         context.update_molecule(new_mol)
 
+        # Write optimised geometry to {fname}_opt.xyz
+        opt_xyz_path = self._write_opt_xyz(new_mol, context.work_dir)
+
         logger.info(
             "Geometry optimisation converged: energy=%.6f Hartree",
             opt_result.energy,
         )
 
+        artifacts = {
+            "opt_result": opt_result,
+            "molecule": new_mol,
+        }
+        if opt_xyz_path is not None:
+            artifacts["opt_xyz_path"] = opt_xyz_path
+
         return StageResult(
             status=StageStatus.COMPLETED,
             message=f"Optimised geometry (energy={opt_result.energy:.6f} Ha)",
-            artifacts={
-                "opt_result": opt_result,
-                "molecule": new_mol,
-            },
+            artifacts=artifacts,
         )
 
     def should_skip(self, context: PipelineContext) -> bool:
         """Skip when only matching against the database or in dry-run mode."""
         return context.config.database_match_only or context.config.dry_run
+
+    @staticmethod
+    def _write_opt_xyz(molecule, work_dir: Path) -> Path:
+        """Write the optimised geometry to a Tinker-style XYZ file.
+
+        The file is named ``{molecule.name}_opt.xyz`` and placed in the
+        working directory.
+
+        Parameters
+        ----------
+        molecule:
+            Molecule with optimised coordinates.
+        work_dir:
+            Directory to write the file into.
+
+        Returns
+        -------
+        Path
+            Absolute path to the written XYZ file.
+        """
+        stem = molecule.name or "mol"
+        xyz_path = Path(work_dir) / f"{stem}_opt.xyz"
+
+        coords = molecule.coordinates
+        rdmol = molecule.rdmol
+        n_atoms = molecule.num_atoms
+
+        lines = [f"    {n_atoms}  {stem} optimised geometry"]
+        for i in range(n_atoms):
+            atom = rdmol.GetAtomWithIdx(i)
+            sym = atom.GetSymbol()
+            x, y, z = coords[i]
+            # 1-based atom index, symbol, coords, atom type (placeholder 0),
+            # then bonded atom indices (1-based)
+            neighbors = sorted(
+                nb.GetIdx() + 1 for nb in atom.GetNeighbors()
+            )
+            nb_str = "  ".join(str(n) for n in neighbors)
+            lines.append(
+                f"  {i + 1:>4}  {sym:<2}  {x:>12.6f}  {y:>12.6f}  "
+                f"{z:>12.6f}     0  {nb_str}"
+            )
+
+        xyz_path.write_text("\n".join(lines) + "\n")
+        logger.info("Wrote optimised geometry to %s", xyz_path)
+        return xyz_path

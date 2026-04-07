@@ -31,6 +31,7 @@ from poltype.pipeline.factory import build_default_pipeline
 from poltype.pipeline.stage import StageResult, StageStatus
 from poltype.pipeline.stages.validation import ValidationStage
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -80,6 +81,12 @@ class MockBackend(QMBackend):
             angles=scan_angles,
             energies=np.zeros_like(scan_angles),
         )
+
+    def compute_dma(self, molecule, method="MP2", basis_set="6-311G**", **kw):
+        from pathlib import Path
+        fchk = Path(molecule.work_dir) / f"{molecule.name or 'mol'}_dma.fchk"
+        fchk.write_text("mock fchk")
+        return DMAResult(fchk_path=fchk, energy=-76.0)
 
     def compute_wbo_matrix(self, molecule, method="HF", basis_set="6-31G*", **kw):
         n = molecule.num_atoms

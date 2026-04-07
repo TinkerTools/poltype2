@@ -36,6 +36,7 @@ from poltype.pipeline.factory import build_default_pipeline
 from poltype.pipeline.runner import PipelineRunner
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -93,6 +94,12 @@ class MockBackend(QMBackend):
     ):
         scan = angles if angles is not None else np.arange(-180, 180, 15.0)
         return TorsionScanResult(angles=scan, energies=np.zeros_like(scan))
+
+    def compute_dma(self, molecule, method="MP2", basis_set="6-311G**", **kw):
+        from pathlib import Path
+        fchk = Path(molecule.work_dir) / f"{molecule.name or 'mol'}_dma.fchk"
+        fchk.write_text("mock fchk")
+        return DMAResult(fchk_path=fchk, energy=-76.0)
 
     def compute_wbo_matrix(self, molecule, method="HF", basis_set="6-31G*", **kw):
         return WBOResult(wbo_matrix=np.eye(molecule.num_atoms))

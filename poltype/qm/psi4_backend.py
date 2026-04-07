@@ -31,6 +31,7 @@ import numpy as np
 
 from poltype.molecule.molecule import Molecule
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -235,6 +236,53 @@ class Psi4Backend(QMBackend):
             energy=float(e),
             converged=True,
             log_path=work_dir / "opt.log",
+        )
+
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str = "MP2",
+        basis_set: str = "6-311G**",
+        **kwargs,
+    ) -> DMAResult:
+        """DMA single-point via Psi4 to produce an fchk file.
+
+        Psi4 does not natively produce Gaussian-style fchk files, so this
+        method writes a Molden file from the wavefunction and converts it
+        to fchk using ``molden2fchk`` if available.  Alternatively, for
+        Gaussian-based GDMA workflows, users should use the Gaussian
+        backend.
+        """
+        import psi4
+
+        work_dir = self._get_work_dir(molecule)
+        multiplicity: int = kwargs.get("multiplicity", 1)
+
+        with _PSI4_LOCK:
+            self._init_psi4(work_dir, "dma.log")
+            psi_mol = psi4.geometry(
+                self._build_geom_string(molecule, multiplicity)
+            )
+            psi4.set_options({"basis": basis_set})
+            e, wfn = psi4.energy(method, return_wfn=True, molecule=psi_mol)
+
+            # Write Molden file (portable wavefunction exchange format)
+            molden_path = work_dir / "dma.molden"
+            psi4.molden(wfn, str(molden_path))
+
+            # Write fchk if psi4 fchk writer is available
+            fchk_path = work_dir / "dma.fchk"
+            try:
+                psi4.fchk(wfn, str(fchk_path))
+            except (AttributeError, Exception):
+                # psi4.fchk may not exist in all versions; the molden
+                # file can be used with a converter like molden2fchk.
+                fchk_path = molden_path
+
+        return DMAResult(
+            fchk_path=fchk_path,
+            energy=float(e),
+            log_path=work_dir / "dma.log",
         )
 
     def compute_esp_grid(

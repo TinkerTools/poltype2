@@ -34,6 +34,7 @@ from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
 from poltype.pipeline.stages.multipole import MultipoleStage
 from poltype.pipeline.stages.torsion import TorsionFittingStage
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -104,6 +105,18 @@ class MockBackend(QMBackend):
             angles=scan_angles,
             energies=np.zeros_like(scan_angles),
         )
+
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str = "MP2",
+        basis_set: str = "6-311G**",
+        **kwargs,
+    ) -> DMAResult:
+        from pathlib import Path
+        fchk = Path(molecule.work_dir) / f"{molecule.name or 'mol'}_dma.fchk"
+        fchk.write_text("mock fchk")
+        return DMAResult(fchk_path=fchk, energy=-76.0)
 
     def compute_wbo_matrix(
         self,

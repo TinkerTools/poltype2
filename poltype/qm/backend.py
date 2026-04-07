@@ -95,6 +95,29 @@ class TorsionScanResult:
 
 
 @dataclass
+class DMAResult:
+    """Outcome of a DMA (Distributed Multipole Analysis) QM calculation.
+
+    This calculation is typically run at MP2/6-311G** to produce a
+    wavefunction that GDMA can analyse for atomic multipoles.
+
+    Attributes
+    ----------
+    fchk_path:
+        Path to the formatted checkpoint file produced by the calculation.
+        This file is consumed by GDMA.
+    energy:
+        Final QM energy in Hartree.
+    log_path:
+        Path to the QM log / output file.
+    """
+
+    fchk_path: Path
+    energy: float = 0.0
+    log_path: Optional[Path] = None
+
+
+@dataclass
 class WBOResult:
     """Outcome of a Wiberg Bond Order matrix calculation.
 
@@ -223,6 +246,36 @@ class QMBackend(ABC):
         Returns
         -------
         TorsionScanResult
+        """
+
+    @abstractmethod
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str,
+        basis_set: str,
+        **kwargs,
+    ) -> DMAResult:
+        """Run a QM single-point to produce a formatted checkpoint (fchk).
+
+        The resulting fchk file is consumed by the GDMA program to
+        extract distributed multipoles.  Typically called with
+        ``method="MP2"`` and ``basis_set="6-311G**"``.
+
+        Parameters
+        ----------
+        molecule:
+            Input molecule at the optimised geometry.
+        method:
+            QM method string (e.g. ``"MP2"``).
+        basis_set:
+            Basis set string (e.g. ``"6-311G**"``).
+        **kwargs:
+            Backend-specific keyword arguments.
+
+        Returns
+        -------
+        DMAResult
         """
 
     @abstractmethod

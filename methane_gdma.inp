@@ -1,0 +1,9 @@
+Title "DMA analysis"
+
+File /home/runner/work/poltype2/poltype2/methane_dma.fchk
+Multipoles
+  Limit quadrupole
+  Punch /home/runner/work/poltype2/poltype2/methane_gdma.punch
+Start
+
+Finish
