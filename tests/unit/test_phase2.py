@@ -632,13 +632,17 @@ class TestPySCFBackend:
 
 
 class TestSelectBackend:
-    def test_default_is_pyscf(self, default_config):
+    def test_default_is_psi4(self, default_config):
         backend = select_backend(default_config)
-        assert isinstance(backend, PySCFBackend)
+        assert isinstance(backend, Psi4Backend)
 
     def test_dont_use_pyscf_selects_psi4(self):
         cfg = PoltypeConfig(qm=QMConfig(dont_use_pyscf=True))
         assert isinstance(select_backend(cfg), Psi4Backend)
+
+    def test_backend_pyscf_selects_pyscf(self):
+        cfg = PoltypeConfig(qm=QMConfig(backend="pyscf"))
+        assert isinstance(select_backend(cfg), PySCFBackend)
 
     def test_use_gaus_selects_gaussian(self):
         cfg = PoltypeConfig(qm=QMConfig(use_gaus=True))
@@ -683,7 +687,7 @@ class TestPipelineBackendIntegration:
         backend = select_backend(default_config)
         ctx.backend = backend
         assert ctx.backend is backend
-        assert ctx.backend.name == "pyscf"
+        assert ctx.backend.name == "psi4"
 
     def test_stage_fails_without_backend(self, context_with_molecule):
         """Geometry opt stage requires both molecule and backend."""
@@ -715,11 +719,11 @@ class TestPipelineBackendIntegration:
     def test_backend_selection_from_config_variants(self):
         """select_backend produces the right type for each config variant."""
         configs = [
-            (PoltypeConfig(), PySCFBackend),
+            (PoltypeConfig(), Psi4Backend),
             (PoltypeConfig(qm=QMConfig(use_gaus=True)), GaussianBackend),
             (
-                PoltypeConfig(qm=QMConfig(dont_use_pyscf=True)),
-                Psi4Backend,
+                PoltypeConfig(qm=QMConfig(backend="pyscf")),
+                PySCFBackend,
             ),
         ]
         for cfg, expected_type in configs:

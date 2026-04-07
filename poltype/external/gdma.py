@@ -74,6 +74,17 @@ class GDMARunner:
         work_dir = Path(work_dir)
         work_dir.mkdir(parents=True, exist_ok=True)
 
+        fchk_path = Path(fchk_path).resolve()
+        if not fchk_path.exists():
+            raise FileNotFoundError(
+                f"fchk file does not exist: {fchk_path}"
+            )
+        if fchk_path.suffix != ".fchk":
+            raise ValueError(
+                f"GDMA requires a .fchk file, but got: {fchk_path}. "
+                f"Ensure the QM backend produces a formatted checkpoint file."
+            )
+
         gdma_input_path = work_dir / f"{molecule_name}_gdma.inp"
         gdma_output_path = work_dir / f"{molecule_name}_gdma.out"
         punch_path = work_dir / f"{molecule_name}_gdma.punch"
