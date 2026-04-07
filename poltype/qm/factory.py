@@ -28,14 +28,15 @@ def select_backend(
 ) -> QMBackend:
     """Instantiate the correct :class:`QMBackend` based on *config*.
 
-    Selection logic mirrors the legacy ``if self.use_gaus … elif … else``
-    chain:
+    Selection logic:
 
     1. If ``config.qm.use_gaus`` or ``config.qm.use_gaus_opt_only`` is
-       ``True`` → :class:`~poltype.qm.gaussian_backend.GaussianBackend`.
-    2. If ``config.qm.dont_use_pyscf`` is ``False`` (i.e. PySCF is
-       *allowed*) and Psi4 is not selected → :class:`~poltype.qm.pyscf_backend.PySCFBackend`.
-    3. Otherwise → :class:`~poltype.qm.psi4_backend.Psi4Backend` (default).
+       ``True`` → :class:`~poltype.qm.gaussian_backend.GaussianBackend`
+       (legacy flag override).
+    2. Otherwise the ``config.qm.backend`` field is used:
+       ``"gaussian"`` → :class:`~poltype.qm.gaussian_backend.GaussianBackend`,
+       ``"pyscf"`` → :class:`~poltype.qm.pyscf_backend.PySCFBackend`,
+       ``"psi4"`` (default) → :class:`~poltype.qm.psi4_backend.Psi4Backend`.
 
     Parameters
     ----------
@@ -60,6 +61,7 @@ def select_backend(
     num_proc = res.num_proc or 1
     max_mem_gb = res.max_mem_gb
 
+    # Legacy flags override the ``backend`` field for backward compatibility.
     if qm.use_gaus or qm.use_gaus_opt_only:
         return GaussianBackend(
             work_dir=work_dir,
@@ -67,14 +69,22 @@ def select_backend(
             max_mem_gb=max_mem_gb,
         )
 
-    if not qm.dont_use_pyscf:
+    # Use the explicit ``backend`` field as the primary selector.
+    if qm.backend == "gaussian":
+        return GaussianBackend(
+            work_dir=work_dir,
+            num_proc=num_proc,
+            max_mem_gb=max_mem_gb,
+        )
+
+    if qm.backend == "pyscf":
         return PySCFBackend(
             work_dir=work_dir,
             num_proc=num_proc,
             max_mem_gb=max_mem_gb,
         )
 
-    # Default: Psi4
+    # Default: Psi4 (backend == "psi4")
     return Psi4Backend(
         work_dir=work_dir,
         psi4_args=qm.psi4_args,

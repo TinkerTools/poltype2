@@ -162,10 +162,10 @@ class TestPySCFBackendInterface:
 
 
 class TestSelectBackend:
-    def test_default_is_pyscf(self, default_config):
-        # Default: use_gaus=False, dont_use_pyscf=False → PySCF
+    def test_default_is_psi4(self, default_config):
+        # Default: backend="psi4" → Psi4
         backend = select_backend(default_config)
-        assert isinstance(backend, PySCFBackend)
+        assert isinstance(backend, Psi4Backend)
 
     def test_dont_use_pyscf_selects_psi4(self):
         cfg = PoltypeConfig(qm=QMConfig(dont_use_pyscf=True))

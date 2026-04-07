@@ -245,13 +245,10 @@ class Psi4Backend(QMBackend):
         basis_set: str = "6-311G**",
         **kwargs,
     ) -> DMAResult:
-        """DMA single-point via Psi4 to produce an fchk file.
+        """DMA single-point via Psi4 to produce an fchk file for GDMA.
 
-        Psi4 does not natively produce Gaussian-style fchk files, so this
-        method writes a Molden file from the wavefunction and converts it
-        to fchk using ``molden2fchk`` if available.  Alternatively, for
-        Gaussian-based GDMA workflows, users should use the Gaussian
-        backend.
+        Uses Psi4's :class:`psi4.core.FCHKWriter` to write a formatted
+        checkpoint file that GDMA can consume directly.
         """
         import psi4
 
@@ -266,18 +263,10 @@ class Psi4Backend(QMBackend):
             psi4.set_options({"basis": basis_set})
             e, wfn = psi4.energy(method, return_wfn=True, molecule=psi_mol)
 
-            # Write Molden file (portable wavefunction exchange format)
-            molden_path = work_dir / "dma.molden"
-            psi4.molden(wfn, str(molden_path))
-
-            # Write fchk if psi4 fchk writer is available
+            # Write fchk using Psi4's FCHKWriter (required by GDMA)
             fchk_path = work_dir / "dma.fchk"
-            try:
-                psi4.fchk(wfn, str(fchk_path))
-            except (AttributeError, Exception):
-                # psi4.fchk may not exist in all versions; the molden
-                # file can be used with a converter like molden2fchk.
-                fchk_path = molden_path
+            fchk_writer = psi4.core.FCHKWriter(wfn)
+            fchk_writer.write(str(fchk_path))
 
         return DMAResult(
             fchk_path=fchk_path,

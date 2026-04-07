@@ -761,6 +761,23 @@ class TestExternalToolRunners:
         assert result.punch_path == punch
         assert result.log_path is None
 
+    def test_gdma_rejects_missing_fchk(self, tmp_path):
+        from poltype.external.gdma import GDMARunner
+        runner = GDMARunner()
+        with pytest.raises(FileNotFoundError, match="does not exist"):
+            runner.run(
+                fchk_path=tmp_path / "missing.fchk",
+                work_dir=tmp_path,
+            )
+
+    def test_gdma_rejects_non_fchk_extension(self, tmp_path):
+        from poltype.external.gdma import GDMARunner
+        molden = tmp_path / "dma.molden"
+        molden.write_text("dummy")
+        runner = GDMARunner()
+        with pytest.raises(ValueError, match="requires a .fchk file"):
+            runner.run(fchk_path=molden, work_dir=tmp_path)
+
     def test_poledit_result_dataclass(self):
         from poltype.external.poledit import PoleditResult
         result = PoleditResult()
