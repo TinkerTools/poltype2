@@ -282,10 +282,9 @@ class PySCFBackend(QMBackend):
         wd = Path(wd)
         wd.mkdir(parents=True, exist_ok=True)
 
-        # Write Molden file
-        fchk_path = wd / "dma.molden"
-        with open(str(fchk_path), "w") as f:
-            molden_writer.from_scf(mf, str(fchk_path))
+        # Write Molden file (used as wavefunction exchange format for GDMA)
+        molden_path = wd / "dma.molden"
+        molden_writer.from_scf(mf, str(molden_path))
 
         energy = 0.0
         try:
@@ -294,7 +293,7 @@ class PySCFBackend(QMBackend):
             pass
 
         return DMAResult(
-            fchk_path=fchk_path,
+            fchk_path=molden_path,
             energy=energy,
         )
 
