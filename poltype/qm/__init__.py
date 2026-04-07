@@ -10,6 +10,7 @@ Re-exports the :class:`QMBackend` ABC, result dataclasses, and the
 from __future__ import annotations
 
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -21,6 +22,7 @@ from poltype.qm.factory import select_backend
 __all__ = [
     "QMBackend",
     "OptimizationResult",
+    "DMAResult",
     "ESPGridResult",
     "TorsionScanResult",
     "WBOResult",

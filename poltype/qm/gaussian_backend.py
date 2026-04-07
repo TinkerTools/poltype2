@@ -20,6 +20,7 @@ from rdkit.Chem import AllChem
 
 from poltype.molecule.molecule import Molecule
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -323,6 +324,76 @@ class GaussianBackend(QMBackend):
             coordinates=coords,
             energy=energy,
             converged=converged,
+            log_path=log_path,
+        )
+
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str = "MP2",
+        basis_set: str = "6-311G**",
+        **kwargs,
+    ) -> DMAResult:
+        """DMA single-point via Gaussian to produce an fchk file.
+
+        Writes a Gaussian input that runs a single-point calculation and
+        produces a checkpoint file.  The checkpoint is then converted to a
+        formatted checkpoint (fchk) using ``formchk``.  The resulting fchk
+        file is consumed by GDMA.
+
+        Keyword arguments
+        -----------------
+        formchk_exe : str
+            Path to the ``formchk`` executable (default ``"formchk"``).
+        """
+        wd = self._resolve_work_dir(molecule)
+        stem = molecule.name or "mol"
+        inp_path = wd / f"{stem}_dma.gjf"
+        chk_name = f"{stem}_dma.chk"
+        chk_path = wd / chk_name
+
+        density_kw = " Density=MP2" if method.upper() == "MP2" else ""
+        route = (
+            f"#P {method}/{basis_set}{density_kw} "
+            f"SP NoSymm"
+        )
+        content = (
+            f"{self._link0()}"
+            f"%Chk={chk_name}\n"
+            f"{route}\n\n"
+            f"{stem} DMA single-point\n\n"
+            f"{self._coord_block(molecule)}\n\n"
+        )
+        inp_path.write_text(content)
+        log_path = self._run_gaussian(inp_path)
+        log_text = log_path.read_text()
+
+        try:
+            energy = self._parse_final_energy(log_text)
+        except ValueError as exc:
+            raise RuntimeError(
+                f"Energy parse failed for DMA calculation {log_path}: {exc}"
+            ) from exc
+
+        # Convert chk → fchk
+        fchk_path = wd / f"{stem}_dma.fchk"
+        formchk_exe = kwargs.get("formchk_exe", "formchk")
+        result = subprocess.run(
+            [formchk_exe, str(chk_path), str(fchk_path)],
+            cwd=str(wd),
+            capture_output=True,
+            text=True,
+        )
+        if not fchk_path.exists():
+            raise RuntimeError(
+                f"formchk did not produce {fchk_path}.\n"
+                f"stdout: {result.stdout[:1000]}\n"
+                f"stderr: {result.stderr[:1000]}"
+            )
+
+        return DMAResult(
+            fchk_path=fchk_path,
+            energy=energy,
             log_path=log_path,
         )
 

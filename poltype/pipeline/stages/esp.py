@@ -9,13 +9,18 @@ The correct protocol is:
 
 1. **DMA** (:class:`MultipoleStage`) — Distributed Multipole Analysis to
    obtain initial atomic multipoles.
-2. **ESP fitting** (this stage) — Electrostatic potential fitting to
-   further optimise those multipoles.
+2. **ESP fitting** (this stage) — High-level QM (MP2/aug-cc-pVTZ) to
+   compute the electrostatic potential, then Tinker's ``potential``
+   program to fit multipoles targeting that ESP.
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
 
 from poltype.errors import BackendError
 from poltype.pipeline.context import PipelineContext
@@ -28,10 +33,13 @@ DEFAULT_THOLE = 0.3900
 class ESPFittingStage(Stage):
     """Compute the ESP grid and optimise multipoles via potential fitting.
 
-    Consumes the ``multipole_frames`` artifact published by the upstream
-    :class:`MultipoleStage` and calls :meth:`QMBackend.compute_esp_grid`
-    with the ESP method and basis set from ``context.config.qm`` to
-    refine the atomic multipoles.
+    This stage:
+
+    1. Runs a high-level QM calculation (default MP2/aug-cc-pVTZ) to
+       compute the electrostatic potential on a grid around the molecule.
+    2. Optionally runs Tinker's ``potential`` program to fit the
+       multipoles from the upstream :class:`MultipoleStage` to match
+       the computed ESP.
     """
 
     def __init__(self) -> None:
@@ -77,6 +85,7 @@ class ESPFittingStage(Stage):
         qm = context.config.qm
         molecule = context.molecule
 
+        # ---- Step 5: Run QM at high level to get ESP ----
         logger.info(
             "Computing ESP grid: method=%s basis=%s",
             qm.esp_method,
@@ -100,22 +109,96 @@ class ESPFittingStage(Stage):
         num_points = len(esp_result.esp_values)
         logger.info("ESP grid computed: %d grid points", num_points)
 
+        # Write ESP grid data to file for Tinker potential program
+        esp_grid_path = self._write_esp_grid(
+            esp_result, context.work_dir, molecule.name or "mol",
+        )
+
+        # ---- Step 6: Run Tinker potential to fit multipoles ----
+        potential_result = None
+        opt_xyz_path = context.get_artifact("opt_xyz_path")
+        if opt_xyz_path is not None:
+            try:
+                from poltype.external.potential import PotentialRunner
+
+                potential = PotentialRunner(
+                    potential_exe=context.config.potential_path,
+                )
+                potential_result = potential.run(
+                    xyz_path=opt_xyz_path,
+                    work_dir=context.work_dir,
+                    molecule_name=molecule.name or "mol",
+                    esp_grid_path=esp_grid_path,
+                )
+                logger.info(
+                    "Potential fitting completed: key file at %s",
+                    potential_result.key_path,
+                )
+            except FileNotFoundError:
+                logger.warning(
+                    "potential executable not found (%s); skipping "
+                    "potential fitting step.",
+                    context.config.potential_path,
+                )
+            except Exception as exc:
+                logger.warning("Potential fitting failed: %s", exc)
+
         multipoles_by_atom_index = self._build_multipoles_by_atom_index(context)
         polarization_by_atom_index = self._build_polarization_by_atom_index(context)
+
+        artifacts = {
+            "esp_result": esp_result,
+            "fitted_multipoles_by_atom_index": multipoles_by_atom_index,
+            "polarization_params_by_atom_index": polarization_by_atom_index,
+        }
+        if esp_grid_path is not None:
+            artifacts["esp_grid_path"] = esp_grid_path
+        if potential_result is not None:
+            artifacts["potential_result"] = potential_result
 
         return StageResult(
             status=StageStatus.COMPLETED,
             message=f"ESP grid computed ({num_points} points)",
-            artifacts={
-                "esp_result": esp_result,
-                "fitted_multipoles_by_atom_index": multipoles_by_atom_index,
-                "polarization_params_by_atom_index": polarization_by_atom_index,
-            },
+            artifacts=artifacts,
         )
 
     def should_skip(self, context: PipelineContext) -> bool:
         """Skip when only matching against the database or in dry-run mode."""
         return context.config.database_match_only or context.config.dry_run
+
+    @staticmethod
+    def _write_esp_grid(
+        esp_result,
+        work_dir: Path,
+        molecule_name: str,
+    ) -> Optional[Path]:
+        """Write the ESP grid to a file for Tinker's potential program.
+
+        The file contains grid coordinates (Angstroms) and ESP values
+        (atomic units) in a format suitable for potential fitting.
+
+        Returns
+        -------
+        Path or None
+            Path to the written grid file, or None if no grid points.
+        """
+        if len(esp_result.esp_values) == 0:
+            return None
+
+        grid_path = Path(work_dir) / f"{molecule_name}_esp.grid"
+        n_points = len(esp_result.esp_values)
+
+        lines = [f"{n_points}"]
+        for i in range(n_points):
+            x, y, z = esp_result.grid_coords[i]
+            v = esp_result.esp_values[i]
+            lines.append(
+                f"  {x:>14.8f}  {y:>14.8f}  {z:>14.8f}  {v:>14.8f}"
+            )
+
+        grid_path.write_text("\n".join(lines) + "\n")
+        logger.info("Wrote ESP grid (%d points) to %s", n_points, grid_path)
+        return grid_path
 
     @staticmethod
     def _build_multipoles_by_atom_index(context: PipelineContext) -> list[dict]:

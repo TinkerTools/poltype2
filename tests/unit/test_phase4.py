@@ -34,6 +34,7 @@ from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
 from poltype.pipeline.stages.multipole import MultipoleStage
 from poltype.pipeline.stages.torsion import TorsionFittingStage
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -104,6 +105,18 @@ class MockBackend(QMBackend):
             angles=scan_angles,
             energies=np.zeros_like(scan_angles),
         )
+
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str = "MP2",
+        basis_set: str = "6-311G**",
+        **kwargs,
+    ) -> DMAResult:
+        from pathlib import Path
+        fchk = Path(molecule.work_dir) / f"{molecule.name or 'mol'}_dma.fchk"
+        fchk.write_text("mock fchk")
+        return DMAResult(fchk_path=fchk, energy=-76.0)
 
     def compute_wbo_matrix(
         self,
@@ -573,3 +586,231 @@ class TestFullPipelineWithMockBackend:
         )
         # Pipeline should stop — no multipole result
         assert "multipole" not in result.stage_results
+
+
+# ===================================================================
+# G. New workflow integration tests (Steps 0-6)
+# ===================================================================
+
+
+class TestOptXyzWriting:
+    """Tests for writing {fname}_opt.xyz after geometry optimisation."""
+
+    def test_opt_xyz_written(self, context_with_backend, tmp_path):
+        """Geometry optimisation should write {fname}_opt.xyz."""
+        context_with_backend._work_dir = tmp_path
+        stage = GeometryOptimizationStage()
+        result = stage.execute(context_with_backend)
+        assert result.status is StageStatus.COMPLETED
+        assert "opt_xyz_path" in result.artifacts
+        opt_xyz = result.artifacts["opt_xyz_path"]
+        assert opt_xyz.exists()
+        assert opt_xyz.name == "methane_opt.xyz"
+
+    def test_opt_xyz_content(self, context_with_backend, tmp_path):
+        """The opt.xyz file should contain valid atom lines."""
+        context_with_backend._work_dir = tmp_path
+        stage = GeometryOptimizationStage()
+        result = stage.execute(context_with_backend)
+        text = result.artifacts["opt_xyz_path"].read_text()
+        lines = text.strip().splitlines()
+        # First line is the header with atom count
+        assert "5" in lines[0]  # methane has 5 atoms
+        assert "methane" in lines[0]
+        # Data lines should have atom index, symbol, coords
+        assert len(lines) == 6  # 1 header + 5 atoms
+
+    def test_opt_xyz_coordinates_match(self, context_with_backend, tmp_path):
+        """Coordinates in opt.xyz should match the optimised molecule."""
+        context_with_backend._work_dir = tmp_path
+        stage = GeometryOptimizationStage()
+        result = stage.execute(context_with_backend)
+        mol = result.artifacts["molecule"]
+        text = result.artifacts["opt_xyz_path"].read_text()
+        lines = text.strip().splitlines()
+        # Parse first atom coordinates from line 2
+        parts = lines[1].split()
+        # parts: index, symbol, x, y, z, type, neighbor(s)
+        x_file = float(parts[2])
+        x_mol = mol.coordinates[0][0]
+        assert abs(x_file - x_mol) < 1e-4
+
+
+class TestDMAResultInMultipoleStage:
+    """Tests for DMA QM calculation in MultipoleStage."""
+
+    def test_dma_result_artifact_present(self, context_with_backend):
+        """MultipoleStage should produce a dma_result artifact."""
+        stage = MultipoleStage()
+        result = stage.execute(context_with_backend)
+        assert result.status is StageStatus.COMPLETED
+        assert "dma_result" in result.artifacts
+
+    def test_dma_result_has_fchk_path(self, context_with_backend):
+        """The DMA result should contain a path to the fchk file."""
+        stage = MultipoleStage()
+        result = stage.execute(context_with_backend)
+        dma_result = result.artifacts["dma_result"]
+        assert dma_result.fchk_path is not None
+        assert dma_result.fchk_path.exists()
+
+    def test_dma_result_energy(self, context_with_backend):
+        """The DMA result should contain an energy value."""
+        stage = MultipoleStage()
+        result = stage.execute(context_with_backend)
+        dma_result = result.artifacts["dma_result"]
+        assert dma_result.energy == pytest.approx(-76.0)
+
+    def test_multipole_frames_contain_fchk_path(self, context_with_backend):
+        """The multipole_frames artifact should record the fchk path."""
+        stage = MultipoleStage()
+        result = stage.execute(context_with_backend)
+        frames = result.artifacts["multipole_frames"]
+        assert "fchk_path" in frames
+
+
+class TestESPGridWriting:
+    """Tests for ESP grid file writing in ESPFittingStage."""
+
+    def test_esp_grid_file_written(self, context_with_backend, tmp_path):
+        """ESPFittingStage should write an ESP grid file."""
+        context_with_backend._work_dir = tmp_path
+        stage = ESPFittingStage()
+        result = stage.execute(context_with_backend)
+        assert result.status is StageStatus.COMPLETED
+        assert "esp_grid_path" in result.artifacts
+        grid_path = result.artifacts["esp_grid_path"]
+        assert grid_path.exists()
+        assert grid_path.name == "methane_esp.grid"
+
+    def test_esp_grid_content(self, context_with_backend, tmp_path):
+        """The ESP grid file should contain the correct number of points."""
+        context_with_backend._work_dir = tmp_path
+        stage = ESPFittingStage()
+        result = stage.execute(context_with_backend)
+        grid_path = result.artifacts["esp_grid_path"]
+        text = grid_path.read_text()
+        lines = text.strip().splitlines()
+        # First line is the point count
+        n_points = int(lines[0].strip())
+        assert n_points == 50
+        # Subsequent lines have x, y, z, potential
+        assert len(lines) == n_points + 1
+
+
+class TestDMAResultDataclass:
+    """Tests for the DMAResult dataclass itself."""
+
+    def test_construction(self, tmp_path):
+        """DMAResult can be constructed with required fields."""
+        fchk = tmp_path / "test.fchk"
+        fchk.write_text("dummy")
+        result = DMAResult(fchk_path=fchk, energy=-100.0)
+        assert result.fchk_path == fchk
+        assert result.energy == -100.0
+
+    def test_default_log_path_is_none(self, tmp_path):
+        """DMAResult.log_path defaults to None."""
+        fchk = tmp_path / "test.fchk"
+        fchk.write_text("dummy")
+        result = DMAResult(fchk_path=fchk)
+        assert result.log_path is None
+
+    def test_default_energy_is_zero(self, tmp_path):
+        """DMAResult.energy defaults to 0.0."""
+        fchk = tmp_path / "test.fchk"
+        fchk.write_text("dummy")
+        result = DMAResult(fchk_path=fchk)
+        assert result.energy == 0.0
+
+
+class TestExternalToolRunners:
+    """Tests for external tool runner construction and input generation."""
+
+    def test_gdma_runner_construction(self):
+        from poltype.external.gdma import GDMARunner
+        runner = GDMARunner(gdma_exe="/usr/local/bin/gdma")
+        assert runner.gdma_exe == "/usr/local/bin/gdma"
+
+    def test_gdma_input_generation(self, tmp_path):
+        from poltype.external.gdma import GDMARunner
+        fchk_path = tmp_path / "test.fchk"
+        punch_path = tmp_path / "test.punch"
+        inp = GDMARunner._build_input(fchk_path, punch_path, multipole_rank=2)
+        assert "File" in inp
+        assert str(fchk_path) in inp
+        assert "Punch" in inp
+        assert str(punch_path) in inp
+        assert "quadrupole" in inp
+
+    def test_poledit_runner_construction(self):
+        from poltype.external.poledit import PoleditRunner
+        runner = PoleditRunner(poledit_exe="/usr/local/bin/poledit")
+        assert runner.poledit_exe == "/usr/local/bin/poledit"
+
+    def test_potential_runner_construction(self):
+        from poltype.external.potential import PotentialRunner
+        runner = PotentialRunner(potential_exe="/usr/local/bin/potential")
+        assert runner.potential_exe == "/usr/local/bin/potential"
+
+    def test_gdma_result_dataclass(self, tmp_path):
+        from poltype.external.gdma import GDMAResult
+        punch = tmp_path / "test.punch"
+        punch.write_text("dummy")
+        result = GDMAResult(punch_path=punch)
+        assert result.punch_path == punch
+        assert result.log_path is None
+
+    def test_poledit_result_dataclass(self):
+        from poltype.external.poledit import PoleditResult
+        result = PoleditResult()
+        assert result.key_path is None
+        assert result.log_path is None
+
+    def test_potential_result_dataclass(self):
+        from poltype.external.potential import PotentialResult
+        result = PotentialResult()
+        assert result.key_path is None
+        assert result.log_path is None
+
+
+class TestFullPipelineWorkflow:
+    """Integration tests for the full poltype workflow steps 0-6."""
+
+    def test_opt_xyz_available_in_pipeline(self, default_config, methane, mock_backend, tmp_path):
+        """Full pipeline should produce opt_xyz_path artifact."""
+        runner = build_default_pipeline()
+        ctx = PipelineContext(
+            config=default_config,
+            molecule=methane,
+            backend=mock_backend,
+            work_dir=tmp_path,
+        )
+        result = runner.run(ctx)
+        assert "opt_xyz_path" in result.artifacts
+        assert result.artifacts["opt_xyz_path"].exists()
+
+    def test_dma_result_available_in_pipeline(self, default_config, methane, mock_backend, tmp_path):
+        """Full pipeline should produce dma_result artifact."""
+        runner = build_default_pipeline()
+        ctx = PipelineContext(
+            config=default_config,
+            molecule=methane,
+            backend=mock_backend,
+            work_dir=tmp_path,
+        )
+        result = runner.run(ctx)
+        assert "dma_result" in result.artifacts
+
+    def test_esp_grid_available_in_pipeline(self, default_config, methane, mock_backend, tmp_path):
+        """Full pipeline should produce esp_grid_path artifact."""
+        runner = build_default_pipeline()
+        ctx = PipelineContext(
+            config=default_config,
+            molecule=methane,
+            backend=mock_backend,
+            work_dir=tmp_path,
+        )
+        result = runner.run(ctx)
+        assert "esp_grid_path" in result.artifacts
+        assert result.artifacts["esp_grid_path"].exists()

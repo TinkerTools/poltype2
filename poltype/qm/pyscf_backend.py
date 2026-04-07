@@ -11,6 +11,7 @@ import numpy as np
 
 from poltype.molecule.molecule import Molecule
 from poltype.qm.backend import (
+    DMAResult,
     ESPGridResult,
     OptimizationResult,
     QMBackend,
@@ -251,6 +252,49 @@ class PySCFBackend(QMBackend):
             coordinates=final_coords,
             energy=final_energy,
             converged=True,
+        )
+
+    def compute_dma(
+        self,
+        molecule: Molecule,
+        method: str = "MP2",
+        basis_set: str = "6-311G**",
+        **kwargs,
+    ) -> DMAResult:
+        """DMA single-point via PySCF to produce a Molden wavefunction file.
+
+        PySCF does not produce Gaussian fchk files natively.  This method
+        writes a Molden file that can be converted to fchk using external
+        tools (e.g. ``molden2fchk``), or used directly if GDMA supports
+        Molden input.
+        """
+        try:
+            from pyscf.tools import molden as molden_writer
+        except ImportError as e:
+            raise ImportError(
+                "PySCF is required for compute_dma."
+            ) from e
+
+        pyscf_mol = self._build_pyscf_mol(molecule, basis_set)
+        mf, dm = self._get_mf_and_dm(pyscf_mol, method)
+
+        wd = self.work_dir or molecule.work_dir
+        wd = Path(wd)
+        wd.mkdir(parents=True, exist_ok=True)
+
+        # Write Molden file (used as wavefunction exchange format for GDMA)
+        molden_path = wd / "dma.molden"
+        molden_writer.from_scf(mf, str(molden_path))
+
+        energy = 0.0
+        try:
+            energy = float(getattr(mf, "e_tot", 0.0))
+        except (TypeError, ValueError):
+            pass
+
+        return DMAResult(
+            fchk_path=molden_path,
+            energy=energy,
         )
 
     def compute_esp_grid(
