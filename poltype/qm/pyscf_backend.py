@@ -219,14 +219,33 @@ class PySCFBackend(QMBackend):
         mf = self._build_mf_for_opt(pyscf_mol, method)
         mf_opt = optimize(mf)
 
-        final_mol = getattr(mf_opt, "mol", None)
-        if final_mol is None or not hasattr(final_mol, "atom_coords"):
+        final_mol = mf_opt
+        if not hasattr(final_mol, "atom_coords"):
+            final_mol = getattr(mf_opt, "mol", mf_opt)
+        
+        if not hasattr(final_mol, "atom_coords"):
             raise RuntimeError(
                 f"Could not extract optimised coordinates from {type(mf_opt)}"
             )
 
         final_coords = final_mol.atom_coords() * lib.param.BOHR
-        final_energy = float(getattr(mf_opt, "e_tot", 0.0))
+        
+        # Extract energy. Some correlated methods in PySCF don't have e_tot 
+        # on the optimizer object but keep it in the underlying mf/correlated object.
+        final_energy = 0.0
+        try:
+            final_energy = float(getattr(final_mol, "e_tot", 0.0))
+        except (TypeError, ValueError):
+            pass
+
+        if final_energy == 0.0:
+            try:
+                if hasattr(mf_opt, "e_tot"):
+                    final_energy = float(mf_opt.e_tot)
+                elif hasattr(mf, "e_tot"):
+                    final_energy = float(mf.e_tot)
+            except (TypeError, ValueError):
+                pass
 
         return OptimizationResult(
             coordinates=final_coords,

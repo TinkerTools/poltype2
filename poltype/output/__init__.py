@@ -10,6 +10,12 @@ callers can write::
 from __future__ import annotations
 
 from poltype.output.key_writer import KeyFileWriter
+from poltype.output.params import (
+    MultipoleParam,
+    PolarizeParam,
+    TorsionFold,
+    TorsionParam,
+)
 from poltype.output.summary import RunSummary, SummaryWriter
 from poltype.output.writer import OutputWriter
 from poltype.output.xyz_writer import XYZFileWriter
@@ -20,4 +26,8 @@ __all__ = [
     "XYZFileWriter",
     "RunSummary",
     "SummaryWriter",
+    "MultipoleParam",
+    "PolarizeParam",
+    "TorsionFold",
+    "TorsionParam",
 ]
