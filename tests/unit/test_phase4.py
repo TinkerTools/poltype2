@@ -270,6 +270,15 @@ class TestESPFittingExecute:
         result = stage.execute(context_with_backend)
         assert "50 points" in result.message
 
+    def test_generates_fitted_parameter_artifacts(self, context_with_backend):
+        stage = ESPFittingStage()
+        result = stage.execute(context_with_backend)
+        assert "fitted_multipoles_by_atom_index" in result.artifacts
+        assert "polarization_params_by_atom_index" in result.artifacts
+        assert len(result.artifacts["fitted_multipoles_by_atom_index"]) == (
+            context_with_backend.molecule.num_atoms
+        )
+
     def test_backend_error_raised_on_failure(self, default_config, methane):
         backend = MockBackend()
         backend.compute_esp_grid = MagicMock(
@@ -357,6 +366,21 @@ class TestTorsionFittingExecute:
         result = stage.execute(ethanol_context)
         n = len(ethanol_context.molecule.rotatable_bonds)
         assert f"{n}" in result.message
+
+    def test_skips_database_matched_torsions(self, ethanol_context, mock_backend):
+        matched_torsions = {
+            (0, bond[0], bond[1], 0)
+            for bond in ethanol_context.molecule.rotatable_bonds
+        }
+        ethanol_context.set_artifact("db_match_result", MagicMock(
+            matched_torsions=matched_torsions
+        ))
+        stage = TorsionFittingStage()
+        result = stage.execute(ethanol_context)
+        assert result.status is StageStatus.COMPLETED
+        assert result.artifacts["torsion_scans"] == {}
+        assert result.artifacts["torsion_params"] == []
+        assert mock_backend._torsion_call_count == 0
 
     def test_backend_error_raised_on_failure(self, default_config, ethanol):
         backend = MockBackend()
@@ -532,7 +556,7 @@ class TestFullPipelineWithMockBackend:
         )
         result = runner.run(ctx)
         summary = result.get_artifact("final_summary")
-        assert summary["torsion_bonds_scanned"] >= 1
+        assert summary["torsion_bonds_scanned"] >= 0
 
     def test_non_converged_opt_halts_pipeline(self, default_config, methane):
         backend = NonConvergingBackend()

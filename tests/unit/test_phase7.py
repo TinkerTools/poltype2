@@ -573,6 +573,52 @@ class TestDatabaseMatchStage:
         match_result = result.artifacts["db_match_result"]
         assert match_result.all_atoms_matched
 
+    def test_execute_materializes_fitted_multipoles(self, tmp_path, smarts_file):
+        db = SmallMoleculeDB(smarts_file)
+        stage = DatabaseMatchStage(database=db)
+        ctx = _make_context(tmp_path)
+        ctx.set_artifact("type_records", [
+            TypeRecord(atom_index=i, atom_type=10 + i, atom_class=10 + i)
+            for i in range(ctx.molecule.num_atoms)
+        ])
+        ctx.set_artifact("fitted_multipoles_by_atom_index", [
+            {
+                "atom_index": i,
+                "frame_atom_indices": [i],
+                "charge": 0.0,
+                "dipole": (0.0, 0.0, 0.0),
+                "quadrupole": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+            }
+            for i in range(ctx.molecule.num_atoms)
+        ])
+        ctx.set_artifact("polarization_params_by_atom_index", [
+            {
+                "atom_index": i,
+                "alpha": 1.0,
+                "thole": 0.39,
+                "neighbor_atom_indices": [],
+            }
+            for i in range(ctx.molecule.num_atoms)
+        ])
+        result = stage.execute(ctx)
+        assert "multipoles" in result.artifacts
+        assert "polarization_params" in result.artifacts
+        assert len(result.artifacts["multipoles"]) == ctx.molecule.num_atoms
+
+    def test_execute_infers_matched_torsions(self, tmp_path, smarts_file):
+        db = SmallMoleculeDB(smarts_file)
+        stage = DatabaseMatchStage(database=db)
+        ctx = _make_context(tmp_path)
+        records = [
+            TypeRecord(atom_index=i, atom_type=1, atom_class=1)
+            for i in range(ctx.molecule.num_atoms)
+        ]
+        ctx.set_artifact("type_records", records)
+        result = stage.execute(ctx)
+        assert len(result.artifacts["db_match_result"].matched_torsions) == len(
+            ctx.molecule.rotatable_bonds
+        )
+
     def test_should_skip_dry_run(self, tmp_path):
         stage = DatabaseMatchStage()
         ctx = _make_context(tmp_path, dry_run=True)

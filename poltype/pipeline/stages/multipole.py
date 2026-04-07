@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import logging
 
-from poltype.errors import StageError
 from poltype.pipeline.context import PipelineContext
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
@@ -64,6 +63,7 @@ class MultipoleStage(Stage):
             qm.dma_basis_set,
         )
 
+        frames_by_atom_index = self._build_frames_by_atom_index(context)
         multipole_frames = {
             "source": "dma",
             "num_atoms": context.molecule.num_atoms,
@@ -71,6 +71,7 @@ class MultipoleStage(Stage):
             "dma_basis_set": qm.dma_basis_set,
             "gdma_path": context.config.gdma_path,
             "poledit_path": context.config.poledit_path,
+            "frames_by_atom_index": frames_by_atom_index,
         }
 
         logger.info(
@@ -90,3 +91,22 @@ class MultipoleStage(Stage):
     def should_skip(self, context: PipelineContext) -> bool:
         """Skip when only matching against the database or in dry-run mode."""
         return context.config.database_match_only or context.config.dry_run
+
+    @staticmethod
+    def _build_frames_by_atom_index(context: PipelineContext) -> dict[int, list[int]]:
+        """Build simple local frames keyed by atom index.
+
+        The full GDMA/poledit integration is not yet wired up, so this stage
+        records a stable topology-derived local frame for each atom. The
+        downstream ESP fitting stage later remaps these atom-index frames onto
+        the final Tinker atom types once atom typing has completed.
+        """
+        rdmol = context.molecule.rdmol
+        frames: dict[int, list[int]] = {}
+        for atom in rdmol.GetAtoms():
+            atom_idx = atom.GetIdx()
+            neighbor_indices = sorted(
+                neighbor.GetIdx() for neighbor in atom.GetNeighbors()
+            )
+            frames[atom_idx] = neighbor_indices[:3] or [atom_idx]
+        return frames

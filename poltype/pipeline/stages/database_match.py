@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING, Optional
 
 from poltype.database.match_result import DatabaseMatchResult
 from poltype.database.parameter_db import ParameterDatabase, SmallMoleculeDB
+from poltype.output.params import MultipoleParam, PolarizeParam
+from poltype.pipeline.parameter_utils import atom_type_for_index, torsion_indices_for_bond
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
 if TYPE_CHECKING:
@@ -73,7 +75,17 @@ class DatabaseMatchStage(Stage):
         # Use pre-computed type records if available.
         type_records = context.get_artifact("type_records")
         result: DatabaseMatchResult = db.lookup(mol.rdmol, type_records)
+        result.matched_torsions = self._matched_torsions(context, result)
         context.set_artifact("db_match_result", result)
+
+        artifacts = {"db_match_result": result}
+        multipoles = self._materialize_multipoles(context, type_records)
+        if multipoles:
+            artifacts["multipoles"] = multipoles
+
+        polarization_params = self._materialize_polarization(context, type_records)
+        if polarization_params:
+            artifacts["polarization_params"] = polarization_params
 
         logger.info(
             "Database match: %.0f%% coverage (%s)",
@@ -86,9 +98,95 @@ class DatabaseMatchStage(Stage):
                 f"{len(result.matched_atom_indices)}/{mol.num_atoms} atoms "
                 f"matched ({result.source})"
             ),
-            artifacts={"db_match_result": result},
+            artifacts=artifacts,
         )
 
     def should_skip(self, context: "PipelineContext") -> bool:
         """Skip in dry-run mode."""
         return getattr(context.config, "dry_run", False)
+
+    @staticmethod
+    def _materialize_multipoles(
+        context: "PipelineContext",
+        type_records,
+    ) -> list[MultipoleParam]:
+        raw_records = context.get_artifact("fitted_multipoles_by_atom_index") or []
+        if not raw_records:
+            return []
+
+        type_map = _type_map(type_records)
+        multipoles_by_type: dict[int, MultipoleParam] = {}
+        for record in raw_records:
+            atom_type = atom_type_for_index(record["atom_index"], type_map)
+            frame = [
+                atom_type_for_index(frame_idx, type_map)
+                for frame_idx in record["frame_atom_indices"]
+            ]
+            multipoles_by_type.setdefault(
+                atom_type,
+                MultipoleParam(
+                    atom_type=atom_type,
+                    frame=frame,
+                    charge=record["charge"],
+                    dipole=record["dipole"],
+                    quadrupole=record["quadrupole"],
+                ),
+            )
+        return sorted(multipoles_by_type.values(), key=lambda mp: mp.atom_type)
+
+    @staticmethod
+    def _materialize_polarization(
+        context: "PipelineContext",
+        type_records,
+    ) -> list[PolarizeParam]:
+        raw_records = context.get_artifact("polarization_params_by_atom_index") or []
+        if not raw_records:
+            return []
+
+        type_map = _type_map(type_records)
+        polarization_by_type: dict[int, PolarizeParam] = {}
+        for record in raw_records:
+            atom_type = atom_type_for_index(record["atom_index"], type_map)
+            neighbor_types = sorted(
+                {
+                    atom_type_for_index(neighbor_idx, type_map)
+                    for neighbor_idx in record["neighbor_atom_indices"]
+                }
+            )
+            existing = polarization_by_type.get(atom_type)
+            if existing is None:
+                polarization_by_type[atom_type] = PolarizeParam(
+                    atom_type=atom_type,
+                    alpha=record["alpha"],
+                    thole=record["thole"],
+                    neighbors=neighbor_types,
+                )
+            else:
+                existing.neighbors = sorted(set(existing.neighbors) | set(neighbor_types))
+        return sorted(polarization_by_type.values(), key=lambda pp: pp.atom_type)
+
+    @staticmethod
+    def _matched_torsions(
+        context: "PipelineContext",
+        result: DatabaseMatchResult,
+    ) -> set[tuple[int, int, int, int]]:
+        """Infer which rotatable bonds can be re-used from database typing."""
+        mol = context.molecule
+        if mol is None:
+            return set()
+
+        matched_atoms = set(result.matched_atom_indices)
+        matched_torsions: set[tuple[int, int, int, int]] = set(result.matched_torsions)
+        for bond in mol.rotatable_bonds:
+            torsion = torsion_indices_for_bond(mol.rdmol, bond)
+            if torsion is None:
+                continue
+            if all(idx in matched_atoms for idx in torsion):
+                matched_torsions.add(torsion)
+        return matched_torsions
+
+
+def _type_map(type_records) -> dict[int, int]:
+    if not type_records:
+        return {}
+    return {record.atom_index: record.atom_type for record in type_records}

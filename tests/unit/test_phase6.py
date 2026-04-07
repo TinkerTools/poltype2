@@ -30,6 +30,7 @@ import pytest
 from poltype.config.schema import PoltypeConfig, QMConfig
 from poltype.molecule.molecule import Molecule
 from poltype.output.key_writer import KeyFileWriter
+from poltype.output.params import MultipoleParam, PolarizeParam, TorsionFold, TorsionParam
 from poltype.output.summary import RunSummary, SummaryWriter
 from poltype.output.writer import OutputWriter
 from poltype.output.xyz_writer import XYZFileWriter
@@ -436,6 +437,31 @@ class TestKeyFileWriter:
         path = w.write(ctx)
         content = path.read_text()
         assert "Torsion scans: 2 bond(s)" in content
+
+    def test_writes_fitted_parameter_sections(self, tmp_path):
+        ctx = _make_context(tmp_path)
+        ctx.set_artifact("multipoles", [
+            MultipoleParam(
+                atom_type=1,
+                frame=[2],
+                charge=-0.12345,
+            )
+        ])
+        ctx.set_artifact("polarization_params", [
+            PolarizeParam(atom_type=1, alpha=1.234, neighbors=[2])
+        ])
+        ctx.set_artifact("torsion_params", [
+            TorsionParam(
+                atom_types=(1, 2, 3, 4),
+                folds=[TorsionFold(amplitude=0.5, phase=0.0, periodicity=3)],
+            )
+        ])
+        w = KeyFileWriter()
+        path = w.write(ctx)
+        content = path.read_text()
+        assert "multipole" in content
+        assert "polarize" in content
+        assert "torsion" in content
 
     def test_raises_on_no_molecule(self, tmp_path):
         config = PoltypeConfig()
