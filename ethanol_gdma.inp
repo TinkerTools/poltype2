@@ -1,9 +1,0 @@
-Title "DMA analysis"
-
-File /home/runner/work/poltype2/poltype2/ethanol_dma.fchk
-Multipoles
-  Limit quadrupole
-  Punch /home/runner/work/poltype2/poltype2/ethanol_gdma.punch
-Start
-
-Finish
