@@ -143,10 +143,10 @@ class GDMARunner:
         return (
             f"Title \"DMA analysis\"\n"
             f"\n"
-            f"File {fchk_path}\n"
+            f"File {fchk_path.name}\n"
             f"Multipoles\n"
             f"  Limit {multipole_rank}\n"
-            f"  Punch {punch_path}\n"
+            f"  Punch {punch_path.name}\n"
             f"Start\n"
             f"\n"
             f"Finish\n"

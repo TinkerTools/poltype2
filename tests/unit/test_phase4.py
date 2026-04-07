@@ -738,9 +738,11 @@ class TestExternalToolRunners:
         punch_path = tmp_path / "test.punch"
         inp = GDMARunner._build_input(fchk_path, punch_path, multipole_rank=2)
         assert "File" in inp
-        assert str(fchk_path) in inp
+        assert fchk_path.name in inp
+        assert str(fchk_path) not in inp
         assert "Punch" in inp
-        assert str(punch_path) in inp
+        assert punch_path.name in inp
+        assert str(punch_path) not in inp
         assert "Limit 2" in inp
 
     def test_poledit_runner_construction(self):
