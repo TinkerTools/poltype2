@@ -3326,7 +3326,7 @@ class PolarizableTyper():
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
                 torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
-                self.WriteToLog('Torsions missing after database search (symclass tuples): '+str(torsionsmissing))
+                self.WriteToLog('Torsions missing after database search: '+str(torsionsmissing))
             if os.path.isfile(self.torsionsmissingfilename):
                 # Read missing torsions
                 torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
@@ -3550,9 +3550,9 @@ class PolarizableTyper():
             torsiondatabaseparser.TestBondAngleEquilValues(self)
 
             # STEP 41
+            self.WriteToLog('Torsions missing passed to get_torlist: '+str(torsionsmissing))
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
-            self.WriteToLog('Torsions missing passed to get_torlist (symclass tuples): '+str(torsionsmissing))
             self.WriteToLog('Rotatable bonds selected for QM scan after get_torlist: '+str(torlist))
             
             # STEP 41-42
