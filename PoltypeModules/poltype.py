@@ -3326,9 +3326,11 @@ class PolarizableTyper():
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
                 torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+                self.WriteToLog('Torsions missing after database search (symclass tuples): '+str(torsionsmissing))
             if os.path.isfile(self.torsionsmissingfilename):
                 # Read missing torsions
                 torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
+                self.WriteToLog('Torsions missing read from '+self.torsionsmissingfilename+': '+str(torsionsmissing))
             if os.path.isfile(self.torsionprmguessfilename):
                 classkeytotorsionparametersguess=torsiondatabaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
             if os.path.isfile(self.vdwmissingfilename):
@@ -3519,6 +3521,7 @@ class PolarizableTyper():
                 if tor not in matched_torlist:
                   tmp.append(tor)
               torsionsmissing = tmp
+              self.WriteToLog('Torsions missing after removing ring-matched torsions: '+str(torsionsmissing))
               with open(self.torsionsmissingfilename, 'w') as f:
                for torsionmiss in torsionsmissing:
                 f.write(str(torsionmiss) + '\n')
@@ -3549,6 +3552,8 @@ class PolarizableTyper():
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
+            self.WriteToLog('Torsions missing passed to get_torlist (symclass tuples): '+str(torsionsmissing))
+            self.WriteToLog('Rotatable bonds selected for QM scan after get_torlist: '+str(torlist))
             
             # STEP 41-42
             # remove matched torsion indices from torlist
@@ -3580,6 +3585,7 @@ class PolarizableTyper():
             nonaroringtorlist=[tuple([i]) for i in nonaroringtorlist]
             self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
             if self.dontdotor==True:
+                self.WriteToLog('dontdotor=True: clearing torlist, no QM torsion fitting will be performed')
                 torlist=[]
             
               
@@ -3660,6 +3666,7 @@ class PolarizableTyper():
                 # Torsion scanning then fitting. *.key_7 will contain updated torsions
                 if not os.path.isfile(self.key7fname):
                     if len(self.torlist)!=0:
+                        self.WriteToLog('Starting QM torsion scan and fit for torsions missing: '+str(torsionsmissing))
                         # torsion scanning
                         for r in range(len(self.toroptmethodlist)):
                             self.toroptmethod=self.toroptmethodlist[r]
@@ -3671,6 +3678,7 @@ class PolarizableTyper():
                             sys.exit()
                         torfit.process_rot_bond_tors(self,optmol)
                     else:
+                        self.WriteToLog('torlist is empty, skipping QM torsion scan/fit; torsions missing: '+str(torsionsmissing))
                         shutil.copy(self.key6fname,self.key7fname)           
            
 
