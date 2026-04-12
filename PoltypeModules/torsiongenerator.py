@@ -1558,7 +1558,7 @@ def get_torlist(poltype,mol,missed_torsions,onlyrotbndslist,allmissing=False):
             nonaroringtorlist.append(unq)
             skiptorsion=False
 
-        if BO>1:
+        if BO>1 and foundmissing==False:
             skiptorsion=True
         rotbndkey = '%d %d' % (unq[1],unq[2])
         if ringbond==True:
