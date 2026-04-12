@@ -3574,6 +3574,16 @@ class PolarizableTyper():
               comb_r = '-'.join([t4,t3,t2,t1])
               if not ((comb in torsions_toadd.keys()) or (comb_r in torsions_toadd.keys())):
                 tmptorlist.append(tor)
+              else:
+                # Even if the representative torsion was matched, keep the bond if any
+                # torsion around this central bond still has zero (unfit) parameters.
+                has_zero_missing = any(
+                  (miss[1] == int(t2) and miss[2] == int(t3)) or
+                  (miss[1] == int(t3) and miss[2] == int(t2))
+                  for miss in torsionsmissing
+                )
+                if has_zero_missing:
+                  tmptorlist.append(tor)
             torlist = tmptorlist
             
             torlist=[tuple(i) for i in torlist]
