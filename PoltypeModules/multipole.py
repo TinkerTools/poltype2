@@ -611,7 +611,14 @@ def gen_peditinfile(poltype,mol):
     f.write("\n")
     f.flush()
     os.fsync(f.fileno())
-    f.write("2\n")
+    if poltype.polgrpcutbnds:
+        f.write("3\n")
+        for b in poltype.polgrpcutbnds.strip(" ,'\"").split(","):
+            a1, a2 = b.split("/")
+            f.write(f"{a1} {a2}\n")
+        f.write("\n")
+    else:
+        f.write("2\n")
     f.write("N\n")
     f.write("Y\n")
 
