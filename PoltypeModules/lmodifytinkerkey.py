@@ -260,8 +260,31 @@ def modkey2_fragmpole(poltype):
         with open(f"./{fname}/poltype.ini", 'w') as pt:
           pt.write(f"structure={f}\n")
           pt.write("dontdotor\n")
-          pt.write("espbasisset=6-311G**\n")
+          # The multipoles derived here are transferred back to the parent, so the
+          # fragment has to run opt/dma/esp at the same level as the parent does.
+          # The *basissetfile and iodine* keywords carry the .gbs used for the
+          # Gaussian gen basis and the iodine (def2 + ECP) override; neither can be
+          # derived from the basis set name, so both are passed explicitly.
+          pt.write(f"use_gaus={poltype.use_gaus}\n")
+          pt.write(f"use_gausoptonly={poltype.use_gausoptonly}\n")
+          pt.write(f"optmethod={poltype.optmethod}\n")
+          pt.write(f"optbasisset={poltype.optbasisset}\n")
+          pt.write(f"optbasissetfile={poltype.optbasissetfile}\n")
+          pt.write(f"iodineoptbasisset={poltype.iodineoptbasisset}\n")
+          pt.write(f"iodineoptbasissetfile={poltype.iodineoptbasissetfile}\n")
+          # ESP is run at the DMA level of the parent, so that a single QM job
+          # (sameleveldmaesp) serves both the multipole derivation and the fit
+          for step in ('dma', 'esp'):
+            pt.write(f"{step}method={poltype.dmamethod}\n")
+            pt.write(f"{step}basisset={poltype.dmabasisset}\n")
+            pt.write(f"{step}basissetfile={poltype.dmabasissetfile}\n")
+            pt.write(f"iodine{step}basisset={poltype.iodinedmabasisset}\n")
+            pt.write(f"iodine{step}basissetfile={poltype.iodinedmabasissetfile}\n")
           pt.write("sameleveldmaesp=True\n")
+          pt.write(f"new_gdma={poltype.new_gdma}\n")
+          for gdmakey, gdmaval in poltype.__dict__.items():
+            if gdmakey.startswith('gdmacommand_'):
+              pt.write(f"{gdmakey}={gdmaval}\n")
           pt.write("scalebigmultipole=True\n")
           pt.write("fragbigmultipole=False\n")
           pt.write(f"dont_use_pyscf={poltype.dont_use_pyscf}\n")

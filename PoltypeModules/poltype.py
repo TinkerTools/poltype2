@@ -582,6 +582,18 @@ class PolarizableTyper():
                             self.gausoptcoords = a
                         elif "suppresstorfiterr" in newline:
                             self.suppresstorfiterr=self.SetDefaultBool(line,a,True)
+                        elif newline.strip() in ('optbasissetfile','toroptbasissetfile',
+                                                 'torspbasissetfile','dmabasissetfile',
+                                                 'espbasissetfile','iodineoptbasisset',
+                                                 'iodineoptbasissetfile','iodinetoroptbasisset',
+                                                 'iodinetoroptbasissetfile','iodinetorspbasisset',
+                                                 'iodinetorspbasissetfile','iodinedmabasisset',
+                                                 'iodinedmabasissetfile','iodineespbasisset',
+                                                 'iodineespbasissetfile'):
+                            # The .gbs file used for the Gaussian gen basis and the iodine
+                            # (def2 + ECP) override cannot be derived from the basis set name,
+                            # so allow them to be set directly (used by child poltype jobs).
+                            self.__dict__[newline.strip()] = a
                         elif "toroptbasisset" in newline:
                             self.toroptbasisset = a
                         elif "dmamethod" in newline:
