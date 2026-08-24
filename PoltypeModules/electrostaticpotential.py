@@ -163,17 +163,11 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
     if not (poltype.sameleveldmaesp and makecube):
-        temp.write('set basis %s '%(poltype.espbasisset)+'\n')
+        opt.WritePsi4BasisBlock(poltype,temp,poltype.espbasisset,poltype.iodineespbasisset,mol.GetSpacedFormula())
         if poltype.allowradicals:
             temp.write('set reference uhf '+'\n')
             temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
         else:
-            spacedformulastr=mol.GetSpacedFormula()
-            if ('I ' in spacedformulastr):
-                temp.write('basis {'+'\n')
-                temp.write('assign '+poltype.espbasisset+'\n')
-                temp.write('assign I '+poltype.iodineespbasisset+'\n')
-                temp.write('}'+'\n')
             if makecube:
                 temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
             else:
@@ -219,24 +213,14 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
-    temp.write('set basis %s '%(poltype.dmabasisset)+'\n')
+    opt.WritePsi4BasisBlock(poltype,temp,poltype.dmabasisset,poltype.iodinedmabasisset,mol.GetSpacedFormula())
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
 
         temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
     else:
-        spacedformulastr=mol.GetSpacedFormula()
-        if ('I ' in spacedformulastr):
-            temp.write('basis {'+'\n')
-            temp.write('assign '+poltype.dmabasisset+'\n')
-            temp.write('assign I '+poltype.iodinedmabasisset+'\n')
-            temp.write('}'+'\n')
-            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
-        
-        else:
-        
-            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
-              
+        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
+
     if poltype.sameleveldmaesp:
         temp.write("wfn.to_file('dma.wfn')\n")
     temp.write('cubeprop(wfn)'+'\n')

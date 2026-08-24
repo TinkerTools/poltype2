@@ -813,12 +813,16 @@ class PolarizableTyper():
         
             # For iodine-containing molecule, keep using different level of DMA and ESP
             # for use with psi4
-            if self.sameleveldmaesp and (not self.use_gaus):
+            moleculecontainsiodine=False
+            if self.molstructfname!=None and os.path.isfile(self.molstructfname):
                 m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
-                for i in range(m.GetNumAtoms()):
-                  atomi = m.GetAtomWithIdx(i)
-                  if atomi.GetAtomicNum() == 53:
-                    self.sameleveldmaesp=False
+                if m!=None:
+                  for i in range(m.GetNumAtoms()):
+                    atomi = m.GetAtomWithIdx(i)
+                    if atomi.GetAtomicNum() == 53:
+                      moleculecontainsiodine=True
+            if self.sameleveldmaesp and (not self.use_gaus) and moleculecontainsiodine:
+                self.sameleveldmaesp=False
                     
             files=os.listdir()
             foundfinal=False
@@ -877,13 +881,22 @@ class PolarizableTyper():
             self.tempmaxdisk=self.maxdisk
             self.tempnumproc=self.numproc
             self.firsterror=False
+            # The ESP job reuses the wavefunction the DMA job wrote out, so the two
+            # are only the same job when the iodine override agrees as well. Comparing
+            # the main basis set alone would undo the psi4 iodine check made above.
+            samedmaespbasisset=(self.dmabasisset.upper() == self.espbasisset.upper())
+            if moleculecontainsiodine:
+                samedmaespbasisset=samedmaespbasisset and (self.iodinedmabasisset.upper() == self.iodineespbasisset.upper())
+            if (self.dmamethod.upper() == self.espmethod.upper()) and samedmaespbasisset:
+                self.sameleveldmaesp=True
+            # One QM job serves both, so DMA has to take every part of the ESP level,
+            # the basis set files that the gaussian gen basis is built from included.
             if self.sameleveldmaesp==True:
                 self.dmamethod=self.espmethod
                 self.dmabasisset=self.espbasisset
+                self.dmabasissetfile=self.espbasissetfile
                 self.iodinedmabasissetfile=self.iodineespbasissetfile
                 self.iodinedmabasisset=self.iodineespbasisset
-            if (self.dmamethod.upper() == self.espmethod.upper()) and (self.dmabasisset.upper() == self.espbasisset.upper()):
-                self.sameleveldmaesp=True
             if self.debugmode==True:
                 self.optmethod="HF"      
                 self.toroptmethod="HF"         

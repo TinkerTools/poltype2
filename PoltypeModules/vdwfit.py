@@ -1028,14 +1028,8 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
         temp.write('set reference uhf '+'\n')
 
     spacedformulastr=mol.GetSpacedFormula()
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile,'')
-        temp.write('}'+'\n')
-        temp.write("e_dim= energy('%s',bsse_type='cp')" % (poltype.espmethod.lower())+'\n')
-    else:
-        temp.write("e_dim= energy('%s/%s',bsse_type='cp')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    opt.WritePsi4BasisBlock(poltype,temp,poltype.espbasisset,poltype.iodineespbasisset,spacedformulastr)
+    temp.write("e_dim= energy('%s',bsse_type='cp')" % (poltype.espmethod.lower())+'\n')
     temp.write('\n')
     temp.write('clean()'+'\n')
     temp.write("psi4.print_out('CP Energy = %10.6f' % (e_dim))"+'\n')

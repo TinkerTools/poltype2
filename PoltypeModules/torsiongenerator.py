@@ -2256,11 +2256,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     spacedformulastr=optmol.GetSpacedFormula()
-    temp.write('basis {'+'\n')
-    temp.write('assign '+poltype.toroptbasisset+'\n')
-    if ('I ' in spacedformulastr):
-        temp.write('assign I '+poltype.iodinetoroptbasisset+'\n')
-    temp.write('}'+'\n')
+    opt.WritePsi4BasisBlock(poltype,temp,poltype.toroptbasisset,poltype.iodinetoroptbasisset,spacedformulastr)
     temp.write("opt_finished = False\n")
     if poltype.use_psi4_geometric_opt:
         temp.write("if not opt_finished:\n")
@@ -2278,7 +2274,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write("    opt_finished = True\n")
 
     if poltype.freq:
-        temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+        temp.write('    scf_e,scf_wfn=freq("%s",return_wfn=True)'%(poltype.toroptmethod.lower())+'\n')
     temp.write('clean()'+'\n')
     temp.write("assert opt_finished\n\n")
     temp.close()
@@ -2589,16 +2585,8 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     spacedformulastr=optmol.GetSpacedFormula()
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('       assign '+poltype.torspbasisset+'\n')
-        temp.write('       assign I '+poltype.iodinetorspbasisset+'\n')
-        temp.write('}'+'\n')
-        temp.write("E, wfn = energy('%s',return_wfn=True)" % (poltype.torspmethod.lower())+'\n')
-
-    else:
-
-        temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
+    opt.WritePsi4BasisBlock(poltype,temp,poltype.torspbasisset,poltype.iodinetorspbasisset,spacedformulastr)
+    temp.write("E, wfn = energy('%s',return_wfn=True)" % (poltype.torspmethod.lower())+'\n')
     temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')

@@ -58,6 +58,30 @@ def GeometryOPTWrapper(poltype,molist):
  
 
 
+def WritePsi4BasisBlock(poltype,temp,basisset,iodinebasisset,spacedformulastr):
+    """
+    Intent: Write the basis set of a psi4 input file, overriding iodine when present.
+    Input: An open psi4 input file, the basis set name wanted for the molecule, the
+    basis set name wanted for iodine, the spaced formula of the molecule being run.
+    Output: The name of the basis block that was written.
+    Referenced By: every psi4 input file generator
+    Description: The Pople basis sets poltype uses by default do not cover iodine, so
+    a def2 basis set (which carries its own ECP) is assigned to iodine while the rest
+    of the molecule keeps the requested basis set. The block is given a name and made
+    active with "set basis", so that it cannot be silently dropped later; note that
+    handing psi4 a "method/basis" string resets the basis set and would defeat this,
+    so the method calls that follow must be given the method alone.
+    """
+    blockname='poltypebasis'
+    temp.write('basis '+blockname+' {'+'\n')
+    temp.write('assign '+basisset+'\n')
+    if ('I ' in spacedformulastr):
+        temp.write('assign I '+iodinebasisset+'\n')
+    temp.write('}'+'\n')
+    temp.write('set basis '+blockname+'\n')
+    return blockname
+
+
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,loose,torsionrestraints=[]):
     """
     Intent:
@@ -217,11 +241,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
-    temp.write('basis {'+'\n')
-    temp.write('assign '+poltype.optbasisset+'\n')
-    if ('I ' in spacedformulastr):
-        temp.write('assign I '+poltype.iodineoptbasisset+'\n')
-    temp.write('}'+'\n')
+    WritePsi4BasisBlock(poltype,temp,poltype.optbasisset,poltype.iodineoptbasisset,spacedformulastr)
 
     temp.write("opt_finished = False\n")
     if poltype.use_psi4_geometric_opt:
@@ -240,7 +260,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write("    opt_finished = True\n")
 
     if poltype.freq:
-        temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+        temp.write('    scf_e,scf_wfn=freq("%s",return_wfn=True)'%(poltype.optmethod.lower())+'\n')
 
     temp.write('clean()'+'\n')
     temp.write("assert opt_finished\n\n")
