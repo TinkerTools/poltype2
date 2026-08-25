@@ -272,15 +272,23 @@ def modkey2_fragmpole(poltype):
           pt.write(f"optbasissetfile={poltype.optbasissetfile}\n")
           pt.write(f"iodineoptbasisset={poltype.iodineoptbasisset}\n")
           pt.write(f"iodineoptbasissetfile={poltype.iodineoptbasissetfile}\n")
-          # ESP is run at the DMA level of the parent, so that a single QM job
-          # (sameleveldmaesp) serves both the multipole derivation and the fit
-          for step in ('dma', 'esp'):
-            pt.write(f"{step}method={poltype.dmamethod}\n")
-            pt.write(f"{step}basisset={poltype.dmabasisset}\n")
-            pt.write(f"{step}basissetfile={poltype.dmabasissetfile}\n")
-            pt.write(f"iodine{step}basisset={poltype.iodinedmabasisset}\n")
-            pt.write(f"iodine{step}basissetfile={poltype.iodinedmabasissetfile}\n")
-          pt.write("sameleveldmaesp=True\n")
+          # DMA and ESP each keep the parent level, and sameleveldmaesp is carried over
+          # rather than forced on: when the parent has to run the two at different
+          # levels (psi4 cannot put a Pople basis on iodine, so the DMA level differs
+          # there), giving the fragment the DMA level for both would fit its ESP at the
+          # wrong level, and the equal levels would silently switch sameleveldmaesp back
+          # on in the fragment job.
+          for step, method, basisset, basissetfile, iodinebasisset, iodinebasissetfile in (
+              ('dma', poltype.dmamethod, poltype.dmabasisset, poltype.dmabasissetfile,
+               poltype.iodinedmabasisset, poltype.iodinedmabasissetfile),
+              ('esp', poltype.espmethod, poltype.espbasisset, poltype.espbasissetfile,
+               poltype.iodineespbasisset, poltype.iodineespbasissetfile)):
+            pt.write(f"{step}method={method}\n")
+            pt.write(f"{step}basisset={basisset}\n")
+            pt.write(f"{step}basissetfile={basissetfile}\n")
+            pt.write(f"iodine{step}basisset={iodinebasisset}\n")
+            pt.write(f"iodine{step}basissetfile={iodinebasissetfile}\n")
+          pt.write(f"sameleveldmaesp={poltype.sameleveldmaesp}\n")
           pt.write(f"new_gdma={poltype.new_gdma}\n")
           for gdmakey, gdmaval in poltype.__dict__.items():
             if gdmakey.startswith('gdmacommand_'):

@@ -887,12 +887,15 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
     atoms = data[0];coord = data[1]
     opt.write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
+    # Only the name written into this com file becomes "gen"; poltype.espbasisset
+    # keeps the real name, which the jobs it is passed on to depend on.
+    espbasisset_local=poltype.espbasisset
     if ('I ' in poltype.mol.GetSpacedFormula()):
-        poltype.espbasisset='gen'
+        espbasisset_local='gen'
         iodinebasissetfile=poltype.iodineespbasissetfile 
         basissetfile=poltype.espbasissetfile 
     
-    opstr="#P %s/%s Sp Counterpoise=2" % (poltype.espmethod,poltype.espbasisset)
+    opstr="#P %s/%s Sp Counterpoise=2" % (poltype.espmethod,espbasisset_local)
 
     if ('I ' in poltype.mol.GetSpacedFormula()):
         opstr+=' pseudo=read'

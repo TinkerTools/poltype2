@@ -2302,28 +2302,31 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
 
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
+    # Only the name written into this com file becomes "gen"; the torsion basis sets
+    # themselves have to keep their real names, since the fragment jobs are handed them.
+    toroptbasisset_local=poltype.toroptbasisset
+    torspbasisset_local=poltype.torspbasisset
     if ('-opt-' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            poltype.toroptbasisset='gen'
+            toroptbasisset_local='gen'
             iodinebasissetfile=poltype.iodinetoroptbasissetfile
             basissetfile=poltype.toroptbasissetfile
 
         if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
-            operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
+            operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,toroptbasisset_local)
         else:
-            operationstr = "%s %s/%s" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
+            operationstr = "%s %s/%s" % (optstr,poltype.toroptmethod,toroptbasisset_local)
         commentstr = poltype.molecprefix + " Rotatable Bond Optimization on " + gethostname()
     else:
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            prevbasisset=poltype.torspbasisset
-            poltype.torspbasisset='gen'
+            torspbasisset_local='gen'
             iodinebasissetfile=poltype.iodinetorspbasissetfile
             basissetfile=poltype.torspbasissetfile
 
         if poltype.torsppcm==True or (poltype.torsppcm==-1 and poltype.pcm):
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,torspbasisset_local)
         else:       
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,torspbasisset_local)
 
         commentstr = poltype.molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
     if ('I ' in poltype.mol.GetSpacedFormula()):

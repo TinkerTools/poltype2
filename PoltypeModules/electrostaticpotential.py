@@ -386,8 +386,12 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed" % (poltype.popbasisset)
     else:
+        # As in the dma branch above, only the name written into this com file becomes
+        # "gen"; poltype.espbasisset keeps the real name so that the jobs it is passed
+        # on to (torsion fragments, Fragments_DMA) still get a usable basis set.
+        espbasisset_local=poltype.espbasisset
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            poltype.espbasisset='gen'
+            espbasisset_local='gen'
             iodinebasissetfile=poltype.iodineespbasissetfile 
             basissetfile=poltype.espbasissetfile 
 
@@ -398,9 +402,9 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             densitystring='SCF'
         
         if poltype.dontfrag==False: 
-            opstr="#P %s/%s Sp Density=%s SCF=Save Pop=NBORead" % (poltype.espmethod,poltype.espbasisset, densitystring)
+            opstr="#P %s/%s Sp Density=%s SCF=Save Pop=NBORead" % (poltype.espmethod,espbasisset_local, densitystring)
         else:
-            opstr="#P %s/%s Sp Density=%s SCF=Save" % (poltype.espmethod,poltype.espbasisset, densitystring)
+            opstr="#P %s/%s Sp Density=%s SCF=Save" % (poltype.espmethod,espbasisset_local, densitystring)
 
 
     if ('I ' in poltype.mol.GetSpacedFormula()):

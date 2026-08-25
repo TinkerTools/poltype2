@@ -384,20 +384,23 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
+    # Only the basis set name written into this com file becomes "gen" (the basis
+    # itself is spelled out at the end of the file). poltype.optbasisset has to keep
+    # the real name, since it is handed down to the fragment jobs as their opt level.
+    optbasisset_local=poltype.optbasisset
     if ('I ' in spacedformulastr):
-        prevoptbasisset=poltype.optbasisset
         if (poltype.use_gaus==True or poltype.use_gausoptonly==True):
-            poltype.optbasisset='gen'
+            optbasisset_local='gen'
     if poltype.freq==True:
         if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
-            optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
+            optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,optbasisset_local)
         else:
-            optstring= "%s %s/%s freq" % (optstr,poltype.optmethod,poltype.optbasisset)
+            optstring= "%s %s/%s freq" % (optstr,poltype.optmethod,optbasisset_local)
     else:
         if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
-            optstring= "%s %s/%s SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
+            optstring= "%s %s/%s SCRF=(PCM)" % (optstr,poltype.optmethod,optbasisset_local)
         else:
-            optstring= "%s %s/%s" % (optstr,poltype.optmethod,poltype.optbasisset)
+            optstring= "%s %s/%s" % (optstr,poltype.optmethod,optbasisset_local)
     if ('I ' in spacedformulastr):
         optstring+=' pseudo=read'
     string=' MaxDisk=%s \n'%(maxdisk)
