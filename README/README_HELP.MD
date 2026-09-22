@@ -113,6 +113,7 @@
 
 ``usepoleditframes`` specifies to use POLEDIT frames rather than poltype frame detection. Default is True.
 
+``polgrpcutbnds`` defines a custom list of bonds to cut for polarization group separation. The format is a comma-separated list of atom index pairs (e.g., "1/2,3/4,5/6"). The default is "", which means to put all atoms in one group.
 
 ``dmamethod``  specifies which quantum method to use for distributed multipole analysis (DMA). Default is MP2.
                   

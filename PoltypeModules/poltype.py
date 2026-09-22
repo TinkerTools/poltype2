@@ -127,6 +127,7 @@ class PolarizableTyper():
         fragmenterdebugmode:bool=False
         jobsatsametime:int=0
         usepoleditframes:bool=True
+        polgrpcutbnds:str=""
         databasematchonly:bool=False
         setupfragjobsonly:bool=False
         allowradicals:bool=False
@@ -465,6 +466,8 @@ class PolarizableTyper():
 
                         elif "usepoleditframes" in newline:
                             self.usepoleditframes=self.SetDefaultBool(line,a,True)
+                        elif "polgrpcutbnds" in newline:
+                            self.polgrpcutbnds=a
                         elif "generateextendedconf" in newline:
                             self.generateextendedconf=self.SetDefaultBool(line,a,True)
                         elif "userconformation" in newline:
