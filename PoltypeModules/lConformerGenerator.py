@@ -341,10 +341,10 @@ if __name__ == "__main__":
   os.chdir(confgendir)
   print('Running XTB optimization for extended conformer...')
   
-  # Use implicit solvent for optimization if there are more than one charged atoms
+  # Use implicit solvent for optimization if there is charged atom
   # We use crude level + 20 cycles so that the extended geometry is almost kept
   charged_atoms = [a for a in m1.GetAtoms() if a.GetFormalCharge() != 0]
-  if len(charged_atoms) > 1:
+  if len(charged_atoms) >= 1:
     cmdstr = f'{xtbpath} {conf_fname}.xyz --opt crude --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} --alpb water --cycles 20 > xtb_run.log '
   else:
     cmdstr = f'{xtbpath} {conf_fname}.xyz --opt crude --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} --cycles 20 > xtb_run.log '
