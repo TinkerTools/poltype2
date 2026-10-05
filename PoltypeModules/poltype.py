@@ -234,6 +234,7 @@ class PolarizableTyper():
         fragbigmultipole:bool=True
         sp2aniline:bool=True
         nonplanarphenol:bool=False
+        force_anti_acid:bool=False
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
         quadrupolethreshold:float=2.4
@@ -610,6 +611,8 @@ class PolarizableTyper():
                             self.sp2aniline=self.SetDefaultBool(line,a,True)
                         elif 'nonplanarphenol' in newline:
                             self.nonplanarphenol=self.SetDefaultBool(line,a,True)
+                        elif 'force_anti_acid' in newline:
+                            self.force_anti_acid=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
@@ -2651,6 +2654,8 @@ class PolarizableTyper():
             cmdstr = f"python \"{script}\" -i {self.molstructfname} -p {xtbpath} -sp2aniline {sp2aniline}"
             if nonplanarphenol:
               cmdstr += " --npp"
+            if self.force_anti_acid:
+              cmdstr += " --faa"
 
             self.WriteToLog('Calling: '+cmdstr)
             os.system(cmdstr)
@@ -3261,6 +3266,8 @@ class PolarizableTyper():
             torgen.get_all_torsions(self,mol)
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,[],[],allmissing=True) # need to call this to get self.rotbndlist to generate restraints for N-dimensional scan in GenerateMaxSymmetryConformer
             # STEP 16
+            if self.force_anti_acid and (self.generateextendedconf==False or self.userxyzgeometry != ''):
+                self.WriteToLog('Warning: force_anti_acid only applies to the conformer generated with generateextendedconf=True and no userxyzgeometry; the input geometry is used as is')
             if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True and self.userxyzgeometry == '':
                 indextocoordslist=self.GenerateExtendedConformer()
                 indextocoordinates=indextocoordslist[0]

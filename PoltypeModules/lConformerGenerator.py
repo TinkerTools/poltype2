@@ -2,6 +2,7 @@
 # This program 
 # - takes the .sdf input structure
 # - uses RDKit to generate 500 conformers
+# - optionally rotates carboxylic acid O=C-O-H to anti (180 deg) in all conformers
 # - optimizes the conformers with distance constraints with MMFF94 in RDKit
 # - selects the extended conformer with Rg, SASA, number of Intramolecular HB, and steric interaction criteria
 # - further optimize the selected extended conformer with xtb to deal with MMFF95 deficiency (puckered Nitrogen etc)
@@ -15,7 +16,7 @@ import sys
 import argparse
 import numpy as np
 from rdkit import Chem
-from rdkit.Chem import AllChem,Descriptors3D,rdFreeSASA,rdmolfiles,ChemicalForceFields
+from rdkit.Chem import AllChem,Descriptors3D,rdFreeSASA,rdmolfiles,ChemicalForceFields,rdMolTransforms
 
 
 def find_intramolecular_hbonds(mol, confId = -1, donorAtoms = [7,8,9], distTol = 2.8):
@@ -107,6 +108,7 @@ if __name__ == "__main__":
   parser.add_argument('-f', dest = 'inputformat', help = "Input file format. Default: SDF", choices = ['SDF', 'MOL2'], type=str.upper, default='SDF')  
   parser.add_argument('--npp', dest = 'nonplanarphenol', help = "Flag to generate nonplanar phenol. Default: False", default=False, action='store_true')
   parser.add_argument('-sp2aniline', dest = 'sp2aniline', choices=['True', 'False'], default='True', help="Enforce planar (sp2) NH2 on aniline-like molecules. Accepts True/False. Default: True")
+  parser.add_argument('--faa', dest = 'force_anti_acid', help = "Flag to put carboxylic acid O=C-O-H in anti (180 deg) conformation. Default: False", default=False, action='store_true')
 
   args = vars(parser.parse_args())
 
@@ -116,6 +118,7 @@ if __name__ == "__main__":
   xtbpath = args['xtbpath']
   nonplanarphenol = args['nonplanarphenol']
   sp2aniline = (args['sp2aniline'] == 'True')
+  force_anti_acid = args['force_anti_acid']
 
   if sp2aniline and nonplanarphenol:
     sys.exit('ERROR: -sp2aniline True and --npp are mutually exclusive '
@@ -127,6 +130,9 @@ if __name__ == "__main__":
 
   if sp2aniline:
     print('Enforcing planar (sp2) NH2 for aniline-like molecules')
+
+  if force_anti_acid:
+    print('User is requesting anti conformation (O=C-O-H = 180 deg) for carboxylic acids')
 
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
@@ -145,16 +151,40 @@ if __name__ == "__main__":
 
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
+  # match carboxylic acid O=C-O-H
+  # rotate to anti before detecting IHB, so the syn H...O=C contact
+  # is not treated as an intramolecular HB below
+  anti_acid_torsions = []
+  if force_anti_acid:
+    pattern = Chem.MolFromSmarts('[OX1]=[CX3]-[OX2]-[#1]')
+    matches = m1.GetSubstructMatches(pattern)
+    for match in matches:
+      o1, c, o2, h = match
+      anti_acid_torsions.append([o1, c, o2, h])
+    if anti_acid_torsions == []:
+      print('No carboxylic acid O=C-O-H found; force_anti_acid has no effect')
+    for i in range(m1.GetNumConformers()):
+      conf = m1.GetConformer(i)
+      for o1, c, o2, h in anti_acid_torsions:
+        rdMolTransforms.SetDihedralDeg(conf, o1, c, o2, h, 180.0)
+
   # find all ihb
   ihbs = []
   for i in range(m1.GetNumConformers()):
     ihb = find_intramolecular_hbonds(m1, confId=i)
     ihbs.append(ihb)
 
+  # anti acid H is held by the torsion restraint, pushing it away from
+  # an acceptor only opens the C-O-H angle (the selection below still
+  # prefers conformers without such IHB)
+  anti_acid_hydrogens = [tor[3] for tor in anti_acid_torsions]
+
   ihb_dist ={}
   for ihb in ihbs:
     for ih in ihb:
       idx1, idx2, dist = ih
+      if idx1 in anti_acid_hydrogens:
+        continue
       u = f"{str(idx1)}-{str(idx2)}"
       if u not in ihb_dist:
         ihb_dist[u] = dist
@@ -235,6 +265,10 @@ if __name__ == "__main__":
         for torsion in aniline_like_torsions:
           t1,t2,t3,t4 = torsion
           ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
+
+    # add torsion restraint for anti carboxylic acid
+    for t1,t2,t3,t4 in anti_acid_torsions:
+      ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 180.0, 180.0, 100.0)
 
     res=ff.Minimize(maxIts=500)
     converged.append(res) 
@@ -328,6 +362,10 @@ if __name__ == "__main__":
         for tor in aniline_like_torsions:
           a, b, c, d = tor
           f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
+
+    # here we set dihedral for anti carboxylic acid
+    for a, b, c, d in anti_acid_torsions:
+      f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},180.0\n")
     f.write("$end\n")
   
   # Get total charge and number of unpaired electrons for later use

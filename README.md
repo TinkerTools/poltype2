@@ -382,6 +382,9 @@ Force planar `c-NH2` (sp2 anilines); also assigns `anglep` / `opbend`. Used with
 #### `nonplanarphenol`
 Force non-planar phenol geometry. Default: `False`.
 
+#### `force_anti_acid`
+Put carboxylic acid `O=C-O-H` in the anti (180°) conformation when generating the extended conformer; the QM optimization keeps it frozen, so multipoles are derived from the anti conformer. Requires `generateextendedconf=True`. Default: `False`.
+
 
 ### 8. Distributed Multipole Analysis (DMA) and ESP
 
