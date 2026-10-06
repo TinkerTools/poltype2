@@ -176,6 +176,9 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
         temp.write('cubeprop(wfn)'+'\n')
         temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     else:
+        # dma.wfn.npy carries the DMA job's named basis block; psi4 can only rebuild the
+        # wavefunction if that block is defined here too
+        opt.WritePsi4BasisBlock(poltype,temp,poltype.dmabasisset,poltype.iodinedmabasisset,mol.GetSpacedFormula())
         temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
         temp.write('oeprop(wfn, "GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
 
