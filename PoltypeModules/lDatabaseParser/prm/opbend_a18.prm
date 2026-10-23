@@ -1,6 +1,9 @@
 # opbend parameters in amoebabio18.prm
 # only big ones are recorded
 # to replace QM-derived values (opbend.prm)
+# Last matching rule wins for each ordered atom-class pair.
+# Keep specific SMARTS after overlapping general rules (e.g. COO- after C=O,
+# and O- of COO- after the general X--->COO- rule).
 [#6][#6](=[O,S])[*]   			  49.60 	% 0,1	% C-->C=O/C=S
 [#1][#6](=[O,S])[*]  			 		140.30 	% 0,1	% H-->C=O/C=S
 [#8,#16]=[#6]([*])[*]  		    54.00 	% 0,1	% O/S-->C=O/C=S

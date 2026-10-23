@@ -940,9 +940,8 @@ def assignOpbendA09(atom2class, keyfile):
     inpformat = 'txyz'
     print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
   
-  # try to match line-by-line
+  # Match in file order; later, more specific SMARTS override earlier matches.
   matched_opbs = {} 
-  tmp = []
   for mol in pybel.readfile(inpformat,inpfile):
     for line in prmlines:
       if ("#" not in line[0]) and (len(line) > 10):
@@ -958,10 +957,8 @@ def assignOpbendA09(atom2class, keyfile):
             a1 = str(match[int(idxs[0])])
             a2 = str(match[int(idxs[1])])
             opb_classes = ' '.join([atom2class[a] for a in [a1, a2]])
-            if (opb_classes not in tmp):
-              tmp.append(opb_classes)
-              opb_prm_str = f"opbend {opb_classes} 0  0  {opb_params}"
-              matched_opbs[opb_classes] = opb_prm_str
+            opb_prm_str = f"opbend {opb_classes} 0  0  {opb_params}"
+            matched_opbs[opb_classes] = opb_prm_str
   
   # replace opbend parameters if they 
   # have been matched from amoebabio18.prm
