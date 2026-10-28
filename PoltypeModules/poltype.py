@@ -65,6 +65,7 @@ from itertools import product,combinations
 import random
 import ldatabaseparser
 import lmodifytinkerkey
+import polarizationgroups
 
 @dataclass
 class PolarizableTyper():
@@ -3388,7 +3389,8 @@ class PolarizableTyper():
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # STEP 31
-                    cmdstr = self.peditexe + " 1 " + self.gdmafname + " < " + self.peditinfile
+                    peditinput = polarizationgroups.prepare_poledit_groups(self)
+                    cmdstr = self.peditexe + " 1 " + self.gdmafname + " < " + peditinput
                     self.call_subsystem([cmdstr],True)
                     # Add header to the key file output by poledit
                     while not os.path.isfile(self.keyfnamefrompoledit):

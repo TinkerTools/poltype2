@@ -86,7 +86,8 @@
 
 #### Polarizability Parameter Search
 * Atomic polarizability parameters are directly matched from the database. These parameters are used as inputs for the TINKER program POLEDIT, along with the GDMA output to obtain the initial multipole parameters, which will be subjected to further optimization using higher-level electrostatic potential data. 
-* Polarization groups are determined first by separating groups by rotatable bonds, then removing univalent atoms and bonds internal to aromatic rings. Then functional groups are detected and grouped together via POLEDIT.
+* POLEDIT determines the default polarization groups by cutting bonds subject to its terminal-atom, aromatic-ring, and functional-group rules. Poltype additionally keeps terminal NH2, NH3 (including NH3+), OH, and SH substituents in the same group as any directly attached aromatic ring, including heteroaromatic rings. CH3–aromatic bonds remain eligible for cutting.
+* For molecules with these substituents, Poltype obtains the installed POLEDIT's default cuts in a temporary preliminary run and writes an explicit cut list to `*-peditin-groups.txt`. The final POLEDIT run uses this list and the original GDMA multipoles, so the group override applies before intramolecular polarization is removed. Existing completed key files are reused; regenerate the initial POLEDIT outputs to apply the new rules to an old run.
 
 #### Valence Parameter Search
 * Valence parameters including bond, angle, strbnd, opbend, are matched to the amoeba21 database, which has much larger chemical coverage than amoeba09. 
