@@ -15,6 +15,34 @@ from polarizationgroups import (aromatic_group_bonds, poledit_cut_bonds,
                                 prepare_poledit_groups)
 
 
+# Expected protected bonds outside aromatic rings (one-based atom indices).
+CARBONYL_CASES = {
+    'O=Cc1ccccc1': {(1, 2), (2, 3)},                  # benzaldehyde
+    'CC(=O)c1ccccc1': {(2, 3), (2, 4)},               # acetophenone
+    'O=C(O)c1ccccc1': {(1, 2), (2, 3), (2, 4)},      # benzoic acid
+    'O=C([O-])c1ccccc1': {(1, 2), (2, 3), (2, 4)},   # benzoate
+    'NC(=O)c1ccccc1': {(1, 2), (2, 3), (2, 4)},      # benzamide
+    'COC(=O)c1ccccc1': {(2, 3), (3, 4), (3, 5)},     # methyl benzoate
+    'CC(=O)Nc1ccccc1': {(2, 3), (2, 4), (4, 5)},     # acetanilide
+    'CC(=O)Oc1ccccc1': {(2, 3), (2, 4), (4, 5)},     # phenyl acetate
+    'CC(=O)N(C)c1ccccc1': {(2, 3), (2, 4), (4, 6)},  # N-methylacetanilide
+    'CN(C)C(=O)c1ccccc1': {(2, 4), (4, 5), (4, 6)},  # N,N-dimethylbenzamide
+    'O=CNc1ccccc1': {(1, 2), (2, 3), (3, 4)},        # formanilide
+    'O=COc1ccccc1': {(1, 2), (2, 3), (3, 4)},        # phenyl formate
+    'CC(=O)n1cccc1': {(2, 3), (2, 4)},               # N-acetylpyrrole
+    'O=Cc1cccs1': {(1, 2), (2, 3)},                  # heteroaromatic aldehyde
+    'CC(=O)c1ncccc1': {(2, 3), (2, 4)},               # heteroaromatic ketone
+    'O=C(O)c1cccs1': {(1, 2), (2, 3), (2, 4)},       # heteroaromatic acid
+    'NC(=O)c1ncccc1': {(1, 2), (2, 3), (2, 4)},      # heteroaromatic amide
+    'COC(=O)c1cccs1': {(2, 3), (3, 4), (3, 5)},      # heteroaromatic ester
+    'O=Cc1ccc2ccccc2c1': {(1, 2), (2, 3)},           # fused aromatic rings
+    'O=Cc1ccccccccc1': {(1, 2), (2, 3)},             # larger aromatic ring
+    'O=C(c1ccccc1)c1ccccc1': {(1, 2), (2, 3), (2, 9)},  # benzophenone
+    'O=C(Nc1ccccc1)c1ccccc1': {(1, 2), (2, 3), (3, 4), (2, 10)},
+    'O=C(Oc1ccccc1)c1ccccc1': {(1, 2), (2, 3), (3, 4), (2, 10)},
+}
+
+
 class AromaticGroupTests(unittest.TestCase):
     def test_terminal_substituents_on_carbon_and_heteroaromatic_rings(self):
         for smiles in ('Nc1ccccc1', '[NH3+]c1ccccc1', 'Oc1ccccc1',
@@ -42,6 +70,38 @@ class AromaticGroupTests(unittest.TestCase):
         self.assertIn((1, 2), protected)
         self.assertNotIn((5, 6), protected)
 
+    def test_carbonyl_groups_and_directly_attached_rings_stay_together(self):
+        for smiles, core_bonds in CARBONYL_CASES.items():
+            for explicit_h in (False, True):
+                with self.subTest(smiles=smiles, explicit_h=explicit_h):
+                    mol = Chem.MolFromSmiles(smiles)
+                    if explicit_h:
+                        mol = Chem.AddHs(mol)
+                    ring_bonds = {
+                        tuple(sorted((b.GetBeginAtomIdx()+1, b.GetEndAtomIdx()+1)))
+                        for b in mol.GetBonds() if b.GetIsAromatic()}
+                    self.assertEqual(aromatic_group_bonds(mol), core_bonds | ring_bonds)
+
+    def test_carbonyl_groups_with_spacers_or_without_aromatic_rings(self):
+        for smiles in ('CC(=O)Cc1ccccc1', 'O=CCc1ccccc1', 'O=C(O)Cc1ccccc1',
+                       'NC(=O)Cc1ccccc1', 'COC(=O)Cc1ccccc1',
+                       'CC(=O)NCc1ccccc1', 'CC(=O)OCc1ccccc1',
+                       'CC(=O)C', 'CCC=O', 'CC(=O)O', 'CC(=O)N', 'CC(=O)OC',
+                       'CC(=O)C1CCCCC1', 'O=CC1CCCCC1', 'O=C(O)C1CCCCC1',
+                       'NC(=O)C1CCCCC1', 'COC(=O)C1CCCCC1',
+                       'O=C(Cl)c1ccccc1', 'O=C(SC)c1ccccc1'):
+            for explicit_h in (False, True):
+                with self.subTest(smiles=smiles, explicit_h=explicit_h):
+                    mol = Chem.MolFromSmiles(smiles)
+                    if explicit_h:
+                        mol = Chem.AddHs(mol)
+                    self.assertEqual(aromatic_group_bonds(mol), set())
+
+    def test_unrelated_ring_and_methyl_bonds_remain_cuttable(self):
+        mol = Chem.MolFromSmiles('O=Cc1ccc(-c2ccccc2)cc1C')
+        self.assertEqual(aromatic_group_bonds(mol), {
+            (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 13), (13, 14), (3, 14)})
+
     def test_nucleobases(self):
         for smiles in ('Nc1ncnc2[nH]cnc12', 'Nc1cc[nH]c(=O)n1',
                        'Nc1nc2[nH]cnc2c(=O)[nH]1'):
@@ -61,11 +121,12 @@ class AromaticGroupTests(unittest.TestCase):
                     self.assertEqual(poledit_cut_bonds(xyz, key), {(1, 2)})
 
     def test_no_probe_when_no_protected_substituent(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / 'toluene.mol'
-            Chem.MolToMolFile(Chem.MolFromSmiles('Cc1ccccc1'), str(path))
-            poltype = SimpleNamespace(molstructfname=str(path), peditinfile='original.in')
-            self.assertEqual(prepare_poledit_groups(poltype), 'original.in')
+        for smiles in ('Cc1ccccc1', 'CC(=O)Cc1ccccc1', 'CC(=O)N', 'CC(=O)OC'):
+            with self.subTest(smiles=smiles), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / 'molecule.mol'
+                Chem.MolToMolFile(Chem.MolFromSmiles(smiles), str(path))
+                poltype = SimpleNamespace(molstructfname=str(path), peditinfile='original.in')
+                self.assertEqual(prepare_poledit_groups(poltype), 'original.in')
 
 
 @unittest.skipUnless(os.environ.get('POLEDIT_TEST_EXE'), 'Set POLEDIT_TEST_EXE for Tinker integration')
@@ -74,7 +135,7 @@ class PoleditIntegrationTests(unittest.TestCase):
         for smiles in ('Nc1ccccc1', '[NH3+]c1ccccc1', 'Oc1ccccc1',
                        'Sc1ccccc1', 'Nn1cccc1', 'Nc1ccc(C)cc1',
                        'Nc1ncnc2[nH]cnc12', 'Nc1cc[nH]c(=O)n1',
-                       'Nc1nc2[nH]cnc2c(=O)[nH]1'):
+                       'Nc1nc2[nH]cnc2c(=O)[nH]1', *CARBONYL_CASES):
             with self.subTest(smiles=smiles), tempfile.TemporaryDirectory() as directory:
                 workdir = Path(directory)
                 mol = Chem.AddHs(Chem.MolFromSmiles(smiles))
@@ -115,9 +176,16 @@ class PoleditIntegrationTests(unittest.TestCase):
                 finalcuts = poledit_cut_bonds(workdir / 'molecule.xyz', workdir / 'molecule.key')
                 protected = aromatic_group_bonds(mol)
                 self.assertFalse(finalcuts & protected)
-                self.assertNotIn((1, 2), finalcuts)
+                if smiles not in CARBONYL_CASES:
+                    self.assertNotIn((1, 2), finalcuts)
                 if smiles == 'Nc1ccc(C)cc1':
                     self.assertIn((5, 6), finalcuts)
+                if smiles == 'O=C(O)c1ccccc1':
+                    # The entire COOH, including O-H, stays with the ring.
+                    self.assertEqual(finalcuts, set())
+                if smiles == 'COC(=O)c1ccccc1':
+                    # Only O-CH3 is cut; the methyl hydrogens stay with CH3.
+                    self.assertEqual(finalcuts, {(1, 2)})
                 # The manual list must preserve every other automatic cut.
                 automatic = workdir / 'automatic'
                 automatic.mkdir()

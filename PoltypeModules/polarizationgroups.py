@@ -1,4 +1,4 @@
-"""Preserve aromatic NH2/NH3/OH/SH attachments in POLEDIT groups."""
+"""Preserve selected aromatic substituents in POLEDIT groups."""
 
 import os
 import shlex
@@ -8,13 +8,27 @@ import tempfile
 from rdkit import Chem
 
 
+# Match only the functional-group core. Recursive constraints identify the
+# group without including alkyl substituents in the protected bonds.
+_CARBONYL_GROUPS = tuple(Chem.MolFromSmarts(smarts) for smarts in (
+    '[CX3H1;$([C]-[#6])]=[OX1]',                       # aldehyde
+    '[CX3;$([C](-[#6])-[#6])]=[OX1]',                 # ketone
+    '[CX3;H1,$([C]-[#6])](=[OX1])-[OX2H1,OX1-]',      # acid/carboxylate
+    '[CX3;H1,$([C]-[#6])](=[OX1])-[#7X3]',             # amide
+    '[CX3;H1,$([C]-[#6])](=[OX1])-[OX2H0;$([O]-[#6])]',  # ester
+))
+
+
 def aromatic_group_bonds(mol):
     """Return protected bonds as sorted pairs of one-based atom indices.
 
-    Only terminal NH2/NH3/OH/SH substituents qualify. Aromatic atoms may
-    have any element and belong to rings of any size. Include the aromatic
-    ring bonds so the whole ring stays together even if Tinker's aromaticity
-    heuristic does not recognize it.
+    Keep terminal NH2/NH3/OH/SH and ketone, aldehyde, carboxylic acid,
+    amide, and ester cores with directly attached aromatic rings. Attachment
+    through an amide N or ester O also qualifies. Aromatic atoms may have
+    any element and belong to rings of any size. Include the aromatic ring
+    bonds so the whole ring stays together even if Tinker's aromaticity
+    heuristic does not recognize it. Alkyl substituent bonds retain the
+    installed POLEDIT's default treatment.
     """
     protected = set()
     ring_atoms = set()
@@ -31,6 +45,21 @@ def aromatic_group_bonds(mol):
             continue
         protected.add(tuple(sorted((atom.GetIdx()+1, aromatic.GetIdx()+1))))
         ring_atoms.add(aromatic.GetIdx())
+
+    for pattern in _CARBONYL_GROUPS:
+        for match in mol.GetSubstructMatches(pattern):
+            attachments = set()
+            for index in match:
+                for neighbor in mol.GetAtomWithIdx(index).GetNeighbors():
+                    if neighbor.GetIsAromatic() and neighbor.IsInRing():
+                        attachments.add(tuple(sorted((index+1, neighbor.GetIdx()+1))))
+                        ring_atoms.add(neighbor.GetIdx())
+            if not attachments:
+                continue
+            protected.update(attachments)
+            for bond in pattern.GetBonds():
+                protected.add(tuple(sorted((match[bond.GetBeginAtomIdx()]+1,
+                                            match[bond.GetEndAtomIdx()]+1))))
 
     pending = list(ring_atoms)
     while pending:
@@ -100,7 +129,8 @@ def prepare_poledit_groups(poltype):
                          'Poltype POLEDIT input ending in 2, N, Y')
     # Resolve the parameter file before entering the temporary directory.
     lines[0] = os.path.abspath(lines[0].strip() or poltype.paramhead)
-    poltype.WriteToLog('Preserving aromatic NH2/NH3/OH/SH polarization groups')
+    poltype.WriteToLog('Preserving aromatic NH2/NH3/OH/SH and '
+                      'ketone/aldehyde/acid/amide/ester polarization groups')
     with tempfile.TemporaryDirectory(prefix='poltype-polarization-') as workdir:
         shutil.copyfile(poltype.gdmafname, os.path.join(workdir, 'probe.gdmaout'))
         probeinput = os.path.join(workdir, 'probe.in')
