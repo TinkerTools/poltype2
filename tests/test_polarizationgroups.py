@@ -16,6 +16,21 @@ from polarizationgroups import (aromatic_group_bonds, poledit_cut_bonds,
 
 
 # Expected protected bonds outside aromatic rings (one-based atom indices).
+AMINE_CASES = {
+    'CNc1ccccc1': {(2, 3)},                         # secondary amine
+    'CN(C)c1ccccc1': {(2, 4)},                      # tertiary amine
+    'C[NH2+]c1ccccc1': {(2, 3)},                    # protonated secondary amine
+    'C[NH+](C)c1ccccc1': {(2, 4)},                  # protonated tertiary amine
+    'CNc1ncccc1': {(2, 3)},                        # heteroaromatic ring
+    'CN(C)c1cccs1': {(2, 4)},                       # heteroaromatic ring
+    'CNn1cccc1': {(2, 3)},                         # aromatic nitrogen attachment
+    'CN(C)c1ccc2ccccc2c1': {(2, 4)},                # fused aromatic rings
+    'N(c1ccccc1)c1ccccc1': {(1, 2), (1, 8)},        # two directly attached rings
+    'CN(c1ccccc1)c1ccccc1': {(2, 3), (2, 9)},       # tertiary diarylamine
+    'c1ccccc1N1CCCC1': {(6, 7)},                    # cyclic amine
+}
+
+
 CARBONYL_CASES = {
     'O=Cc1ccccc1': {(1, 2), (2, 3)},                  # benzaldehyde
     'CC(=O)c1ccccc1': {(2, 3), (2, 4)},               # acetophenone
@@ -60,10 +75,24 @@ class AromaticGroupTests(unittest.TestCase):
                         in protected for b in mol.GetBonds() if b.GetIsAromatic()))
 
     def test_methyl_and_other_substituents_are_not_protected(self):
-        for smiles in ('Cc1ccccc1', 'CNc1ccccc1', 'COc1ccccc1',
-                       'CSc1ccccc1', 'NCCc1ccccc1', 'NC1CCCCC1'):
+        for smiles in ('Cc1ccccc1', 'COc1ccccc1', 'CSc1ccccc1',
+                       'NCCc1ccccc1', 'NC1CCCCC1', 'CNCCc1ccccc1',
+                       'CN(C)Cc1ccccc1', 'CNC1CCCCC1', 'CN(C)C1CCCCC1',
+                       'N#Cc1ccccc1', 'O=[N+]([O-])c1ccccc1', 'CN=Nc1ccccc1'):
             with self.subTest(smiles=smiles):
                 self.assertEqual(aromatic_group_bonds(Chem.MolFromSmiles(smiles)), set())
+
+    def test_substituted_amines_stay_with_rings_but_not_alkyl_substituents(self):
+        for smiles, attachments in AMINE_CASES.items():
+            for explicit_h in (False, True):
+                with self.subTest(smiles=smiles, explicit_h=explicit_h):
+                    mol = Chem.MolFromSmiles(smiles)
+                    if explicit_h:
+                        mol = Chem.AddHs(mol)
+                    ring_bonds = {
+                        tuple(sorted((b.GetBeginAtomIdx()+1, b.GetEndAtomIdx()+1)))
+                        for b in mol.GetBonds() if b.GetIsAromatic()}
+                    self.assertEqual(aromatic_group_bonds(mol), attachments | ring_bonds)
 
     def test_methyl_bond_still_cuttable_on_aminotoluene(self):
         protected = aromatic_group_bonds(Chem.MolFromSmiles('Nc1ccc(C)cc1'))
@@ -135,7 +164,7 @@ class PoleditIntegrationTests(unittest.TestCase):
         for smiles in ('Nc1ccccc1', '[NH3+]c1ccccc1', 'Oc1ccccc1',
                        'Sc1ccccc1', 'Nn1cccc1', 'Nc1ccc(C)cc1',
                        'Nc1ncnc2[nH]cnc12', 'Nc1cc[nH]c(=O)n1',
-                       'Nc1nc2[nH]cnc2c(=O)[nH]1', *CARBONYL_CASES):
+                       'Nc1nc2[nH]cnc2c(=O)[nH]1', *AMINE_CASES, *CARBONYL_CASES):
             with self.subTest(smiles=smiles), tempfile.TemporaryDirectory() as directory:
                 workdir = Path(directory)
                 mol = Chem.AddHs(Chem.MolFromSmiles(smiles))
@@ -176,8 +205,12 @@ class PoleditIntegrationTests(unittest.TestCase):
                 finalcuts = poledit_cut_bonds(workdir / 'molecule.xyz', workdir / 'molecule.key')
                 protected = aromatic_group_bonds(mol)
                 self.assertFalse(finalcuts & protected)
-                if smiles not in CARBONYL_CASES:
+                if smiles not in CARBONYL_CASES and smiles not in AMINE_CASES:
                     self.assertNotIn((1, 2), finalcuts)
+                if smiles in ('CNc1ccccc1', 'CN(C)c1ccccc1'):
+                    self.assertIn((1, 2), finalcuts)
+                    if smiles == 'CN(C)c1ccccc1':
+                        self.assertIn((2, 3), finalcuts)
                 if smiles == 'Nc1ccc(C)cc1':
                     self.assertIn((5, 6), finalcuts)
                 if smiles == 'O=C(O)c1ccccc1':

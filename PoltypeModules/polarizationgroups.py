@@ -22,7 +22,8 @@ _CARBONYL_GROUPS = tuple(Chem.MolFromSmarts(smarts) for smarts in (
 def aromatic_group_bonds(mol):
     """Return protected bonds as sorted pairs of one-based atom indices.
 
-    Keep terminal NH2/NH3/OH/SH and ketone, aldehyde, carboxylic acid,
+    Keep amine N/NH/NH2 (including protonated forms), terminal OH/SH,
+    and ketone, aldehyde, carboxylic acid,
     amide, and ester cores with directly attached aromatic rings. Attachment
     through an amide N or ester O also qualifies. Aromatic atoms may have
     any element and belong to rings of any size. Include the aromatic ring
@@ -33,18 +34,21 @@ def aromatic_group_bonds(mol):
     protected = set()
     ring_atoms = set()
     for atom in mol.GetAtoms():
+        if atom.GetIsAromatic():
+            continue
         hydrogens = atom.GetTotalNumHs(includeNeighbors=True)
-        if not ((atom.GetAtomicNum() == 7 and hydrogens in (2, 3)) or
-                (atom.GetAtomicNum() in (8, 16) and hydrogens == 1)):
-            continue
         heavy = [a for a in atom.GetNeighbors() if a.GetAtomicNum() != 1]
-        if atom.GetIsAromatic() or len(heavy) != 1:
+        amine = (atom.GetAtomicNum() == 7 and
+                 atom.GetTotalDegree() in (3, 4) and
+                 all(b.GetBondType() == Chem.BondType.SINGLE for b in atom.GetBonds()))
+        terminal_oh_sh = (atom.GetAtomicNum() in (8, 16) and
+                          hydrogens == 1 and len(heavy) == 1)
+        if not (amine or terminal_oh_sh):
             continue
-        aromatic = heavy[0]
-        if not (aromatic.GetIsAromatic() and aromatic.IsInRing()):
-            continue
-        protected.add(tuple(sorted((atom.GetIdx()+1, aromatic.GetIdx()+1))))
-        ring_atoms.add(aromatic.GetIdx())
+        for aromatic in heavy:
+            if aromatic.GetIsAromatic() and aromatic.IsInRing():
+                protected.add(tuple(sorted((atom.GetIdx()+1, aromatic.GetIdx()+1))))
+                ring_atoms.add(aromatic.GetIdx())
 
     for pattern in _CARBONYL_GROUPS:
         for match in mol.GetSubstructMatches(pattern):
@@ -129,7 +133,7 @@ def prepare_poledit_groups(poltype):
                          'Poltype POLEDIT input ending in 2, N, Y')
     # Resolve the parameter file before entering the temporary directory.
     lines[0] = os.path.abspath(lines[0].strip() or poltype.paramhead)
-    poltype.WriteToLog('Preserving aromatic NH2/NH3/OH/SH and '
+    poltype.WriteToLog('Preserving aromatic amine N/NH/NH2 (including protonated forms), OH/SH and '
                       'ketone/aldehyde/acid/amide/ester polarization groups')
     with tempfile.TemporaryDirectory(prefix='poltype-polarization-') as workdir:
         shutil.copyfile(poltype.gdmafname, os.path.join(workdir, 'probe.gdmaout'))
